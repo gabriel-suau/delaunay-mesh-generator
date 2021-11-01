@@ -53,7 +53,7 @@ int DMG_hashHedge(DMG_pMesh mesh) {
           }
           key = hedge->nxt;
         } while (key != DMG_UNSET);
-        /* If not found, create the hedge object and set the nxt field of the last seen hedge object to point this hedge */
+        /* If not found, create the hedge object and set the nxt field of the last seen hedge object to point to this hedge */
         if (!flag) {
           htab[hnxt].a = vmin;
           htab[hnxt].b = vmax;

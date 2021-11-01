@@ -21,7 +21,6 @@ int DMG_displayQualHisto(DMG_pMesh mesh, int nclass);
 
 /* Locate */
 int DMG_baryCoord(DMG_pMesh mesh, DMG_Tria *pt, double c[2], double *det, double bc[3]);
-int DMG_isInTria(DMG_pMesh mesh, int k, double c[2]);
 int DMG_locTria(DMG_pMesh mesh, int start, double c[2], double bc[3]);
 
 /* Adjacency relations */
