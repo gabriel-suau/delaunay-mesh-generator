@@ -12,7 +12,7 @@
 
 #define DMG_UNSET -1
 
-#define DMG_EPSILON 1e-15
+#define DMG_EPSILON 1e-16
 
 #define DMG_ALPHA_2D 3.464101615137755 /* 6. / sqrt(3.) */
 
@@ -23,19 +23,22 @@
 typedef struct {
   double c[2];
   int ref;
-} DMG_Point; typedef DMG_Point* DMG_pPoint;
+} DMG_Point;
+typedef DMG_Point* DMG_pPoint;
 
 typedef struct {
   int v[2];
   int ref;
-} DMG_Edge; typedef DMG_Edge* DMG_pEdge;
+} DMG_Edge;
+typedef DMG_Edge* DMG_pEdge;
 
 typedef struct {
   int v[3];
   int edge[3];
   int ref;
   double qual;
-} DMG_Tria; typedef DMG_Tria* DMG_pTria;
+} DMG_Tria;
+typedef DMG_Tria* DMG_pTria;
 
 typedef struct {
   int a, b;
@@ -53,6 +56,7 @@ typedef struct {
   int *head, *neigh;
   int *adja;
   DMG_Hedge *htab;
-} DMG_Mesh; typedef DMG_Mesh* DMG_pMesh;
+} DMG_Mesh;
+typedef DMG_Mesh* DMG_pMesh;
 
 #endif /* TYPES_DMG_H */
