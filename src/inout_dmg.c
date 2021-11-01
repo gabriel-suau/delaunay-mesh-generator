@@ -51,7 +51,7 @@ int DMG_loadMesh_medit(DMG_pMesh mesh, char *filename) {
       continue;
     }
 
-    if (!strncmp(chain, "DMG_Edges", strlen("DMG_Edges"))) {
+    if (!strncmp(chain, "Edges", strlen("Edges"))) {
       fscanf(file, "%d", &mesh->na);
       mesh->edge = (DMG_Edge*) malloc(mesh->na * sizeof(DMG_Edge));
       for (i = 0 ; i < mesh->na ; i++) {
@@ -63,7 +63,7 @@ int DMG_loadMesh_medit(DMG_pMesh mesh, char *filename) {
       continue;
     }
 
-    if (!strncmp(chain, "DMG_Trias", strlen("DMG_Trias"))) {
+    if (!strncmp(chain, "Triangles", strlen("Triangles"))) {
       fscanf(file, "%d", &mesh->nt);
       mesh->tria = (DMG_Tria*) malloc(mesh->nt * sizeof(DMG_Tria));
 
@@ -134,7 +134,7 @@ int DMG_saveMesh_medit(DMG_pMesh mesh, char *filename) {
   }
 
   /** DMG_Edges */
-  strcpy(chain, "\nDMG_Edges\n");
+  strcpy(chain, "\nEdges\n");
   fprintf(file, "%s", chain);
   fprintf(file, "%d\n", mesh->na);
   for (i = 0 ; i < mesh->na ; i++) {
@@ -143,7 +143,7 @@ int DMG_saveMesh_medit(DMG_pMesh mesh, char *filename) {
   }
 
   /** DMG_Trias */
-  strcpy(chain, "\nDMG_Trias\n");
+  strcpy(chain, "\nTriangles\n");
   fprintf(file, "%s", chain);
   fprintf(file, "%d\n", mesh->nt);
   for (i = 0 ; i < mesh->nt ; i++) {
@@ -170,17 +170,17 @@ int DMG_saveMeshAs3D_medit(DMG_pMesh mesh, char *filename) {
   int i;
 
   if (mesh == NULL) {
-    fprintf(stderr, "Error: %s: mesh struct not allocated\n", __func__);
+    fprintf(stderr, "Error: %s:%d: mesh struct not allocated\n", __func__, __LINE__);
     return DMG_FAILURE;
   }
   if (!mesh->np || !mesh->nt) {
-    fprintf(stderr, "Error: %s: can't save an empty mesh\n", __func__);
+    fprintf(stderr, "Error: %s:%d: can't save an empty mesh\n", __func__, __LINE__);
     return DMG_FAILURE;
   }
 
   file = fopen(filename, "w");
   if (file == NULL) {
-    fprintf(stderr, "Error: %s: can't open %s \n", __func__, filename);
+    fprintf(stderr, "Error: %s:%d: can't open %s \n", __func__, __LINE__, filename);
     return DMG_FAILURE;
   }
 
@@ -200,7 +200,7 @@ int DMG_saveMeshAs3D_medit(DMG_pMesh mesh, char *filename) {
   }
 
   /** DMG_Edges */
-  strcpy(chain, "\nDMG_Edges\n");
+  strcpy(chain, "\nEdges\n");
   fprintf(file, "%s", chain);
   fprintf(file, "%d\n", mesh->na);
   for (i = 0 ; i < mesh->na ; i++) {
@@ -209,7 +209,7 @@ int DMG_saveMeshAs3D_medit(DMG_pMesh mesh, char *filename) {
   }
 
   /** DMG_Trias */
-  strcpy(chain, "\nDMG_Trias\n");
+  strcpy(chain, "\nTriangles\n");
   fprintf(file, "%s", chain);
   fprintf(file, "%d\n", mesh->nt);
   for (i = 0 ; i < mesh->nt ; i++) {
