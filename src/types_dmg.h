@@ -41,7 +41,7 @@ typedef struct {
   int a, b;
   int adj1, adj2;
   int nxt;
-} Hedge;
+} DMG_Hedge;
 
 typedef struct {
   int ver;
@@ -52,7 +52,7 @@ typedef struct {
   DMG_Tria *tria;
   int *head, *neigh;
   int *adja;
-  Hedge *htab;
+  DMG_Hedge *htab;
 } DMG_Mesh; typedef DMG_Mesh* DMG_pMesh;
 
 #endif /* TYPES_DMG_H */
