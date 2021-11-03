@@ -4,11 +4,11 @@
 int main(int argc, char **argv)
 {
   DMG_Mesh* mesh;
-  char *filein, *fileout;
+  char *filein, *fileout, *qualout;
   int nclass = 5;
 
   mesh = NULL;
-  filein = fileout = NULL;
+  filein = fileout = qualout = NULL;
 
   /** Check arguments */
   if (argc != 3) {
@@ -30,6 +30,10 @@ int main(int argc, char **argv)
   }
   strcpy(fileout, argv[2]);
 
+  qualout = (char*) malloc(strlen(fileout) * sizeof(char));
+  strncpy(qualout, fileout, strlen(fileout) - strlen(".mesh"));
+  strcat(qualout, ".sol");
+
   /** Init the mesh struct */
   if (DMG_Init_mesh(&mesh) == DMG_FAILURE) {
     exit(EXIT_SUCCESS);
@@ -49,7 +53,13 @@ int main(int argc, char **argv)
   buildVerticesBalls2D(mesh);
 
   /** Save the mesh */
-  if (DMG_saveMeshAs3D_medit(mesh, fileout) == DMG_FAILURE) {
+  if (DMG_saveMesh_medit(mesh, fileout) == DMG_FAILURE) {
+    DMG_Free_mesh(mesh);
+    exit(EXIT_FAILURE);
+  }
+
+  /** Save the quality */
+  if (DMG_saveQual_medit(mesh, qualout) == DMG_FAILURE) {
     DMG_Free_mesh(mesh);
     exit(EXIT_FAILURE);
   }
@@ -57,6 +67,7 @@ int main(int argc, char **argv)
   /** Free all allocated memory */
   free(filein); filein = NULL;
   free(fileout); fileout = NULL;
+  free(qualout); qualout = NULL;
   DMG_Free_mesh(mesh);
 
   return EXIT_SUCCESS;

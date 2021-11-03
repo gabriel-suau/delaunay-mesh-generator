@@ -11,6 +11,7 @@ int DMG_Free_mesh(DMG_pMesh mesh);
 int DMG_loadMesh_medit(DMG_pMesh mesh, char *filename);
 int DMG_saveMesh_medit(DMG_pMesh mesh, char *filename);
 int DMG_saveMeshAs3D_medit(DMG_pMesh mesh, char *filename);
+int DMG_saveQual_medit(DMG_pMesh mesh, char *filename);
 
 /* Quality */
 int DMG_computeQual(DMG_pMesh mesh);

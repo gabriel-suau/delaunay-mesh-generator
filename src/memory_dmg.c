@@ -2,7 +2,7 @@
 
 
 int DMG_Init_mesh(DMG_pMesh *mesh) {
-  *mesh = (DMG_Mesh*) malloc(sizeof(DMG_Mesh));
+  *mesh = (DMG_pMesh)malloc(sizeof(DMG_Mesh));
 
   if (mesh == NULL) {
     fprintf(stderr, "Error: %s: mesh struct allocation failed\n", __func__);

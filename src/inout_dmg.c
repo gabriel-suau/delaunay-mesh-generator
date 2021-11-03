@@ -225,3 +225,50 @@ int DMG_saveMeshAs3D_medit(DMG_pMesh mesh, char *filename) {
 
   return DMG_SUCCESS;
 }
+
+
+int DMG_saveQual_medit(DMG_pMesh mesh, char *filename) { 
+  DMG_pTria pt;
+  FILE *file = NULL;
+  char chain[127];
+  int i;
+
+  if (mesh == NULL) {
+    fprintf(stderr, "Error: %s: mesh struct not allocated\n", __func__);
+    return DMG_FAILURE;
+  }
+  if (!mesh->np || !mesh->nt) {
+    fprintf(stderr, "Error: %s:%d: can't save quality of an empty mesh\n", __func__, __LINE__);
+    return DMG_FAILURE;
+  }
+
+  file = fopen(filename, "w");
+  if (file == NULL) {
+    fprintf(stderr, "Error: %s: can't open %s \n", __func__, filename);
+    return DMG_FAILURE;
+  }
+
+  /** Header */
+  strcpy(chain, "MeshVersionFormatted 2\n");
+  fprintf(file, "%s", chain);
+  strcpy(chain, "\nDimension 2\n");
+  fprintf(file, "%s", chain);
+
+  /** Quality of triangles */
+  strcpy(chain, "\nSolAtTriangles\n");
+  fprintf(file, "%s", chain);
+  fprintf(file, "%d\n", mesh->nt);
+  fprintf(file, "1 1\n");
+  for (i = 0 ; i < mesh->nt ; i++) {
+    pt = &mesh->tria[i];
+    fprintf(file, "%lf\n", pt->qual);
+  }
+
+  /** End string*/
+  strcpy(chain, "\nEnd\n");
+  fprintf(file, "%s", chain);
+
+  fclose(file);
+
+  return DMG_SUCCESS;
+}
