@@ -74,7 +74,7 @@ int DMG_loadMesh_medit(DMG_pMesh mesh, char *filename) {
         pt->v[1]--;
         pt->v[2]--;
 
-        memset(pt->edge, DMG_UNSET, 3 * sizeof(int));
+        pt->flag = 0;
 
         if (DMG_computeTriaArea(mesh, pt) < 0.) {
           tmp = pt->v[2];

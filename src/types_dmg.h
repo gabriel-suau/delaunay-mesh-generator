@@ -34,9 +34,9 @@ typedef DMG_Edge* DMG_pEdge;
 
 typedef struct {
   int v[3];
-  int edge[3];
   int ref;
   double qual;
+  int flag; /* Flag to know if the triangle has been visited when searching for the cavity of a point */
 } DMG_Tria;
 typedef DMG_Tria* DMG_pTria;
 
