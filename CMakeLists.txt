@@ -13,5 +13,8 @@ include_directories(${DMG_SOURCE_DIR})
 # glob source files into one variable
 file(GLOB DMG_SOURCE_FILES ${DMG_SOURCE_DIR}/*.c)
 
+# add compiler options
+add_compile_options(-Wall )
+
 # add the executable
 add_executable(dmg ${DMG_SOURCE_FILES})
