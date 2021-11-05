@@ -2,15 +2,13 @@
 
 
 double DMG_computeArea(double a[2], double b[2], double c[2]) {
-  double abx, aby, acx, acy, bcx, bcy;
+  double abx, aby, acx, acy;
   double area;
 
   abx = b[0] - a[0];
   aby = b[1] - a[1];
   acx = c[0] - a[0];
   acy = c[1] - a[1];
-  bcx = c[0] - b[0];
-  bcy = c[1] - b[1];
 
   area = abx * acy - aby * acx;
 
