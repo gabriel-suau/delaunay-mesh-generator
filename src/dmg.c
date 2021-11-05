@@ -49,9 +49,6 @@ int main(int argc, char **argv)
   DMG_computeQual(mesh);
   DMG_displayQualHisto(mesh, nclass);
 
-  /** Build the ball of each vertex */
-  buildVerticesBalls2D(mesh);
-
   /** Save the mesh */
   if (DMG_saveMesh_medit(mesh, fileout) == DMG_FAILURE) {
     DMG_Free_mesh(mesh);

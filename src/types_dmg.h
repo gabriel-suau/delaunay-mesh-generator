@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <stdint.h>
 
 #define DMG_FAILURE 1
 
@@ -50,12 +51,10 @@ typedef struct {
   int ver;
   int dim;
   int np, na, nt;
-  DMG_Point *point;
-  DMG_Edge *edge;
-  DMG_Tria *tria;
-  int *head, *neigh;
+  DMG_pPoint point;
+  DMG_pEdge edge;
+  DMG_pTria tria;
   int *adja;
-  DMG_Hedge *htab;
 } DMG_Mesh;
 typedef DMG_Mesh* DMG_pMesh;
 

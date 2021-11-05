@@ -34,21 +34,9 @@ int DMG_Free_mesh(DMG_pMesh mesh) {
     mesh->edge = NULL;
     mesh->nt = DMG_UNSET;
   }
-  if (mesh->head) {
-    free(mesh->head);
-    mesh->head = NULL;
-  }
-  if (mesh->neigh) {
-    free(mesh->neigh);
-    mesh->neigh = NULL;
-  }
   if (mesh->adja) {
     free(mesh->adja);
     mesh->adja = NULL;
-  }
-  if (mesh->htab) {
-    free(mesh->htab);
-    mesh->htab = NULL;
   }
 
   free(mesh);

@@ -28,8 +28,7 @@ int DMG_isInCircumcircle(DMG_pMesh mesh, double c[2], DMG_pTria pt);
 int DMG_createCavity(DMG_pMesh mesh, double c[2], int it, int *list);
 
 /* Adjacency relations */
-int DMG_hashHedge(DMG_pMesh mesh);
+int DMG_hashHedge(DMG_pMesh mesh, DMG_Hedge *htab);
 int DMG_setAdja(DMG_pMesh mesh);
-int buildVerticesBalls2D(DMG_pMesh mesh);
 
 #endif /* DMG_H */
