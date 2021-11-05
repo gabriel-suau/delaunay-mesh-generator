@@ -2,6 +2,42 @@
 
 #define DMG_EPSTRIA -1e-18
 
+
+double DMG_orient(double a[2], double b[2], double c[2]) {
+  double abx, aby, acx, acy;
+
+  abx = b[0] - a[0];
+  aby = b[1] - a[1];
+  acx = c[0] - a[0];
+  acy = c[1] - a[1];
+
+  return abx * acy - aby * acx;
+}
+
+
+double DMG_inCircle(double a[2], double b[2], double c[2], double d[2]) {
+  double adx, ady, bdx, bdy, cdx, cdy;
+  double abdet, bcdet, cadet;
+  double adsq, bdsq, cdsq;
+
+  adx = a[0] - d[0];
+  ady = a[1] - d[1];
+  bdx = b[0] - d[0];
+  bdy = b[1] - d[1];
+  cdx = c[0] - d[0];
+  cdy = c[1] - d[1];
+
+  abdet = adx * bdy - bdx * ady;
+  bcdet = bdx * cdy - cdx * bdy;
+  cadet = cdx * ady - adx * cdy;
+  adsq = adx * adx + ady * ady;
+  bdsq = bdx * bdx + bdy * bdy;
+  cdsq = cdx * cdx + cdy * cdy;
+
+  return adsq * bcdet + bdsq * cadet + cdsq * abdet;
+}
+
+
 /* Compute the barycentric coordinates of point c in triangle pt */
 /* Also return 1 if c is in triangle, 0 if c is not in triangle */
 int DMG_baryCoord(DMG_pMesh mesh, DMG_pTria pt, double c[2], double *det, double bc[3]) {
@@ -12,12 +48,12 @@ int DMG_baryCoord(DMG_pMesh mesh, DMG_pTria pt, double c[2], double *det, double
   pc = mesh->point[pt->v[2]].c;
 
   /* Compute the triangle area */
-  *det = DMG_computeArea(pa, pb, pc);
+  *det = DMG_orient(pa, pb, pc);
   *det = 1.0 / *det;
 
   /* Compute the barycentric coordinates */
-  bc[1] = DMG_computeArea(pa, c, pc) * (*det);
-  bc[2] = DMG_computeArea(pa, pb, c) * (*det);
+  bc[1] = DMG_orient(pa, c, pc) * (*det);
+  bc[2] = DMG_orient(pa, pb, c) * (*det);
   bc[0] = 1.0 - (bc[1] + bc[2]);
 
   if ((bc[0] > DMG_EPSTRIA) && (bc[1] > DMG_EPSTRIA) && (bc[2] > DMG_EPSTRIA))
@@ -61,50 +97,6 @@ int DMG_locTria(DMG_pMesh mesh, int start, double c[2], double bc[3]) {
   return it;
 }
 
-/* rad is the radius squared */
-int DMG_findCircumcircle(DMG_pMesh mesh, DMG_pTria pt, double c[2], double *rad) {
-  double *c1, *c2, *c3, m1[2], m2[2], sl1, sl2, b1, b2;
-
-  c1 = mesh->point[pt->v[0]].c;
-  c2 = mesh->point[pt->v[0]].c;
-  c3 = mesh->point[pt->v[0]].c;
-
-  /* Middle of local edge n°1 */
-  m1[0] = 0.5 * (c3[0] - c2[0]);
-  m1[1] = 0.5 * (c3[1] - c2[1]);
-  /* Middle of local edge n°2 */
-  m2[0] = 0.5 * (c3[0] - c1[0]);
-  m2[1] = 0.5 * (c3[1] - c1[1]);
-
-  /* Inverse opposite of the slopes of the segments */
-  sl1 = (c2[0] - c3[0]) / (c3[1] - c2[1]);
-  sl2 = (c1[0] - c3[0]) / (c3[1] - c1[1]);
-
-  /* Ordonee a lorigine */
-  b1 = m1[1] - sl1 * m1[0];
-  b2 = m2[1] - sl2 * m2[0];
-
-  /* Circumcenter coordinates */
-  c[0] = (b2 - b1) / (sl1 - sl2);
-  c[1] = sl2 * c[0] + b2;
-
-  /* Squared radius */
-  *rad = (c1[0] - c[0]) * (c1[0] - c[0]) + (c1[1] - c[1]) * (c1[1] - c[1]);
-
-  return DMG_SUCCESS;
-}
-
-
-int DMG_isInCircumcircle(DMG_pMesh mesh, double c[2], DMG_pTria pt) {
-  double center[2], rad, dist;
-
-  DMG_findCircumcircle(mesh, pt, center, &rad);
-
-  dist = (c[0] - center[0]) * (c[0] - center[0]) + (c[1] - center[1]) * (c[1] - center[1]);
-
-  return (dist < rad ? 1 : 0);
-}
-
 
 int DMG_createCavity(DMG_pMesh mesh, double c[2], int it, int *list) {
   DMG_pTria pt;
@@ -117,3 +109,4 @@ int DMG_createCavity(DMG_pMesh mesh, double c[2], int it, int *list) {
   
   return DMG_SUCCESS;
 }
+

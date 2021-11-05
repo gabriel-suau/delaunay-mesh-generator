@@ -1,21 +1,6 @@
 #include "dmg.h"
 
 
-double DMG_computeArea(double a[2], double b[2], double c[2]) {
-  double abx, aby, acx, acy;
-  double area;
-
-  abx = b[0] - a[0];
-  aby = b[1] - a[1];
-  acx = c[0] - a[0];
-  acy = c[1] - a[1];
-
-  area = abx * acy - aby * acx;
-
-  return area;
-}
-
-
 double DMG_computeTriaArea(DMG_pMesh mesh, DMG_pTria pt) {
   double *a, *b, *c;
 
@@ -23,7 +8,7 @@ double DMG_computeTriaArea(DMG_pMesh mesh, DMG_pTria pt) {
   b = mesh->point[pt->v[1]].c;
   c = mesh->point[pt->v[2]].c;
 
-  return DMG_computeArea(a, b, c);
+  return DMG_orient(a, b, c);
 }
 
 
