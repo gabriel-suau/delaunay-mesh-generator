@@ -62,8 +62,45 @@ int DMG_baryCoord(DMG_pMesh mesh, DMG_pTria pt, double c[2], double *det, double
     return 0;
 }
 
+int DMG_locTria(DMG_pMesh mesh, int start, double c[2]) {
+  DMG_pTria pt;
+  double *a, *b;
+  int it, iter, i, flag, iadj, *adja;
 
-int DMG_locTria(DMG_pMesh mesh, int start, double c[2], double bc[3]) {
+  it = start;
+  iter = 0;
+
+  /* Walk through the triangles */
+  while (iter < mesh->nt) {
+    pt = &mesh->tria[it];
+
+    iadj = 3 * it;
+    adja = &mesh->adja[iadj];
+
+    flag = 0;
+
+    /* Iterate through the edges of triangle it */
+    for (i = 0 ; i < 3 ; i++) {
+      a = mesh->point[pt->v[(i+1)%3]].c;
+      b = mesh->point[pt->v[(i+2)%3]].c;
+
+      if (DMG_orient(a, b, c) < 0.0) {
+        it = adja[i] / 3;
+        flag = 1;
+        break;
+      }
+    }
+
+    /* We found the triangle containing point c */
+    if (!flag) break;
+
+  }
+
+  return it;
+}
+
+
+int DMG_locTria_bary(DMG_pMesh mesh, int start, double c[2], double bc[3]) {
   DMG_pTria pt;
   double det;
   int it, j, iter, dir[3], *adja, iadj;
@@ -98,15 +135,31 @@ int DMG_locTria(DMG_pMesh mesh, int start, double c[2], double bc[3]) {
 }
 
 
-int DMG_createCavity(DMG_pMesh mesh, double c[2], int it, int *list) {
-  DMG_pTria pt;
-  int i;
+int DMG_createCavity(DMG_pMesh mesh, double d[2], int it, int *list) {
+  DMG_pTria pti, ptj;
+  int i, jt, count;
+  double *a, *b, *c;
 
-  list  = (int*)malloc(sizeof(int));
+  list  = (int*)malloc(3 * sizeof(int));
   list[0] = it;
+  count = 1;
 
-  pt = &mesh->tria[it];
-  
+  pti = &mesh->tria[it];
+
+  /*  */
+  for (i = 0 ; i < 3 ; i++) {
+    jt = mesh->adja[it + i] / 3;
+    ptj = &mesh->tria[jt];
+    a = mesh->point[ptj->v[0]].c;
+    b = mesh->point[ptj->v[0]].c;
+    c = mesh->point[ptj->v[0]].c;
+
+    while (DMG_inCircle(a, b, c, d) > DMG_EPSILON) {
+      list[count++] = jt;
+      
+    }
+  }
+
   return DMG_SUCCESS;
 }
 
