@@ -21,22 +21,24 @@ DMG_Qnode* DMG_newNode(int k) {
   return node;
 }
 
-void DMG_enQueue(DMG_Queue *q, int k) {
+int DMG_enQueue(DMG_Queue *q, int k) {
   DMG_Qnode *node = DMG_newNode(k);
 
   if (q->rear == NULL) {
     q->front = q->rear = node;
-    return;
+    return k;
   }
 
   q->rear->next = node;
   q->rear = node;
+  return k;
 }
 
-void DMG_deQueue(DMG_Queue *q) {
+int DMG_deQueue(DMG_Queue *q) {
+  int key;
 
   if (q->front == NULL) {
-    return;
+    return DMG_UNSET;
   }
 
   DMG_Qnode *node = q->front;
@@ -47,7 +49,10 @@ void DMG_deQueue(DMG_Queue *q) {
     q->rear = NULL;
   }
 
+  key = node->key;
   free(node);
+
+  return key;
 }
 
 inline int DMG_qFront(DMG_Queue* q) {
@@ -62,4 +67,8 @@ inline int DMG_qRear(DMG_Queue* q) {
     return DMG_UNSET;
   else
     return q->rear->key;
+}
+
+inline int DMG_qIsEmpty(DMG_Queue *q) {
+  return (q->front == NULL) ? 1 : 0;
 }

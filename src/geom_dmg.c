@@ -136,30 +136,43 @@ int DMG_locTria_bary(DMG_pMesh mesh, int start, double c[2], double bc[3]) {
 
 
 int DMG_createCavity(DMG_pMesh mesh, double d[2], int it, int *list) {
-  DMG_pTria pti, ptj;
-  int i, jt, count;
+  DMG_Queue *q;
+  DMG_pTria pt;
+  int k, jt, count, iadj, *adja;
   double *a, *b, *c;
 
   list  = (int*)malloc(3 * sizeof(int));
   list[0] = it;
   count = 1;
 
-  pti = &mesh->tria[it];
+  /* BFS */
+  q = DMG_createQueue();
+  pt = &mesh->tria[it];
+  pt->flag = 1;
+  DMG_enQueue(q, it);
 
-  /*  */
-  for (i = 0 ; i < 3 ; i++) {
-    jt = mesh->adja[it + i] / 3;
-    ptj = &mesh->tria[jt];
-    a = mesh->point[ptj->v[0]].c;
-    b = mesh->point[ptj->v[0]].c;
-    c = mesh->point[ptj->v[0]].c;
+  while (!DMG_qIsEmpty(q)) {
+    jt = DMG_deQueue(q);
+    pt = &mesh->tria[jt];
 
-    while (DMG_inCircle(a, b, c, d) > DMG_EPSILON) {
+    iadj = 3 * jt;
+    adja = &mesh->adja[iadj];
+
+    a = mesh->point[pt->v[0]].c;
+    b = mesh->point[pt->v[1]].c;
+    c = mesh->point[pt->v[2]].c;
+
+    if (DMG_inCircle(a, b, c, d) > DMG_EPSILON) {
       list[count++] = jt;
-      
+      for (k = 0 ; k < 3 ; k++) {
+        pt = &mesh->tria[adja[k]];
+        if (!pt->flag) {
+          pt->flag = 1;
+          DMG_enQueue(q, adja[k]);
+        }
+      }
     }
   }
 
   return DMG_SUCCESS;
 }
-
