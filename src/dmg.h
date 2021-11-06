@@ -30,4 +30,12 @@ int DMG_displayQualHisto(DMG_pMesh mesh, int nclass);
 int DMG_hashHedge(DMG_pMesh mesh, DMG_Hedge *htab);
 int DMG_setAdja(DMG_pMesh mesh);
 
+/* Queue manipulations */
+DMG_Queue* DMG_createQueue();
+DMG_Qnode* DMG_newNode(int k);
+void DMG_enQueue(DMG_Queue *q, int k);
+void DMG_deQueue(DMG_Queue *q);
+inline int DMG_qFront(DMG_Queue *q);
+inline int DMG_qRear(DMG_Queue *q);
+
 #endif /* DMG_H */

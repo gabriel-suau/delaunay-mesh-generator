@@ -58,4 +58,15 @@ typedef struct {
 } DMG_Mesh;
 typedef DMG_Mesh* DMG_pMesh;
 
+/* One node of the queue (implemented as a singly linked list) */
+typedef struct DMG_Qnode_s {
+  int key;
+  struct DMG_Qnode_s *next;
+} DMG_Qnode;
+
+/* Queue */
+typedef struct {
+  DMG_Qnode *front, *rear;
+} DMG_Queue;
+
 #endif /* TYPES_DMG_H */
