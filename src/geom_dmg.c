@@ -85,7 +85,7 @@ int DMG_locTria(DMG_pMesh mesh, int start, double c[2]) {
       b = mesh->point[pt->v[(i+2)%3]].c;
 
       if (DMG_orient(a, b, c) < 0.0) {
-        it = adja[i] / 3;
+        it = adja[i] / 3; /* mesh->adja[3 * it + i] */
         flag = 1;
         break;
       }
@@ -141,7 +141,6 @@ int DMG_createCavity(DMG_pMesh mesh, double d[2], int it, int *list) {
   int k, jt, count, iadj, *adja;
   double *a, *b, *c;
 
-  list  = (int*)malloc(3 * sizeof(int));
   list[0] = it;
   count = 1;
 

@@ -10,6 +10,8 @@ static const int DMG_tria_vert[5] = {0, 1, 2, 0, 1};
 int DMG_Init_mesh(DMG_pMesh *mesh);
 int DMG_Free_mesh(DMG_pMesh mesh);
 
+/* Mesh manipulations */
+
 /* I/O */
 int DMG_loadMesh_medit(DMG_pMesh mesh, char *filename);
 int DMG_saveMesh_medit(DMG_pMesh mesh, char *filename);
@@ -24,7 +26,7 @@ int DMG_locTria(DMG_pMesh mesh, int start, double c[2]);
 int DMG_locTria_bary(DMG_pMesh mesh, int start, double c[2], double bc[3]);
 int DMG_createCavity(DMG_pMesh mesh, double d[2], int it, int *list);
 
-/*  Quality */
+/* Quality */
 double DMG_computeTriaArea(DMG_pMesh mesh, DMG_pTria pt);
 double DMG_computeTriaQual(DMG_pMesh mesh, DMG_pTria pt);
 int DMG_computeQual(DMG_pMesh mesh);
