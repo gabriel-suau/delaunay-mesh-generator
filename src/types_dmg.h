@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <float.h>
 #include <assert.h>
 #include <stdint.h>
 
@@ -24,6 +25,7 @@
 typedef struct {
   double c[2];
   int ref;
+  int flag; /* Flag to tell il the point has been inserted in the triangulation */
 } DMG_Point;
 typedef DMG_Point* DMG_pPoint;
 
@@ -50,7 +52,7 @@ typedef struct {
 typedef struct {
   int ver;
   int dim;
-  double min[2], max[2], delta[2];
+  double min[2], max[2];
   int np, na, nt; /* Number of entities */
   int npmax, namax, ntmax; /* Max number of entities (size of the arrays) */
   int npu, nau, ntu; /* Indices of the first unused entities */

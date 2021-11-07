@@ -39,7 +39,7 @@ int DMG_loadMesh_medit(DMG_pMesh mesh, char *filename) {
       if (mesh->dim == 2) {
         for (i = 0 ; i < mesh->np ; i++) {
           ppt = &mesh->point[i];
-          fscanf(file, "%lf %lf %d", &ppt->c[0], &ppt->c[1], &ppt->ref); 
+          fscanf(file, "%lf %lf %d", &ppt->c[0], &ppt->c[1], &ppt->ref);
         }
       } else if (mesh->dim == 3) {
         mesh->dim = 2;

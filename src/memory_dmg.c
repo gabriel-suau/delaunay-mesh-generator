@@ -13,7 +13,8 @@ int DMG_Init_mesh(DMG_pMesh *mesh) {
   (*mesh)->np = (*mesh)->na = (*mesh)->nt = DMG_UNSET;
   (*mesh)->npu = (*mesh)->nau = (*mesh)->ntu = DMG_UNSET;
   (*mesh)->npmax = (*mesh)->namax = (*mesh)->ntmax = DMG_UNSET;
-  (*mesh)->min[0] = (*mesh)->min[1] = (*mesh)->max[0] = (*mesh)->max[1] = (*mesh)->delta[0] = (*mesh)->delta[1] = 0.0;
+  (*mesh)->min[0] = (*mesh)->min[1] = DBL_MAX;
+  (*mesh)->max[0] = (*mesh)->max[1] = -DBL_MAX;
 
   return DMG_SUCCESS;
 }
