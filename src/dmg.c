@@ -5,7 +5,8 @@ int main(int argc, char **argv)
 {
   DMG_Mesh* mesh;
   char *filein, *fileout, *qualout;
-  int nclass = 5;
+  int nclass = 5, list[64], i;
+  double c[2];
 
   mesh = NULL;
   filein = fileout = qualout = NULL;
@@ -48,6 +49,26 @@ int main(int argc, char **argv)
   /** Compute and display the quality of the mesh */
   DMG_computeQual(mesh);
   DMG_displayQualHisto(mesh, nclass);
+
+  /** Find the tria containing point c(xmin + 0.5 * delta_x, ymin + 0.5 * delta_y) */
+  DMG_delaunay(mesh);
+  c[0] = mesh->min[0] + 0.5 * (mesh->max[0] - mesh->min[0]);
+  c[1] = mesh->min[1] + 0.5 * (mesh->max[1] - mesh->min[1]);
+
+  for (i = 0 ; i < 64 ; i++) {
+    list[i] = 0;
+  }
+
+  DMG_setAdja(mesh);
+  printf("%f, %f \n", c[0], c[1]);
+  list[0] = DMG_locTria(mesh, 0, c);
+
+  /** Create the cavity starting from this tria */
+  DMG_createCavity(mesh, c, list);
+  for (i = 0 ; i < 64 ; i++) {
+    printf("%d ", list[i]);
+  }
+  printf("\n");
 
   /** Save the mesh */
   if (DMG_saveMesh_medit(mesh, fileout) == DMG_FAILURE) {
