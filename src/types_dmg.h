@@ -50,9 +50,12 @@ typedef struct {
 typedef struct {
   int ver;
   int dim;
-  int np, na, nt;
+  double min[2], max[2], delta[2];
+  int np, na, nt; /* Number of entities */
+  int npmax, namax, ntmax; /* Max number of entities (size of the arrays) */
+  int npu, nau, ntu; /* Indices of the first unused entities */
   DMG_pPoint point;
-  DMG_pEdge edge;
+  DMG_pEdge edge; /* Store the boundary edges (all those edges must exist in the mesh at the end of the triangulation)*/
   DMG_pTria tria;
   int *adja;
 } DMG_Mesh;

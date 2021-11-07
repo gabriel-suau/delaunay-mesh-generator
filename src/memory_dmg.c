@@ -8,7 +8,12 @@ int DMG_Init_mesh(DMG_pMesh *mesh) {
     fprintf(stderr, "Error: %s: mesh struct allocation failed\n", __func__);
     return DMG_FAILURE;
   }
-  (*mesh)->np = (*mesh)->na = (*mesh)->nt = (*mesh)->ver = (*mesh)->dim = DMG_UNSET;
+
+  (*mesh)->ver = (*mesh)->dim = DMG_UNSET;
+  (*mesh)->np = (*mesh)->na = (*mesh)->nt = DMG_UNSET;
+  (*mesh)->npu = (*mesh)->nau = (*mesh)->ntu = DMG_UNSET;
+  (*mesh)->npmax = (*mesh)->namax = (*mesh)->ntmax = DMG_UNSET;
+  (*mesh)->min[0] = (*mesh)->min[1] = (*mesh)->max[0] = (*mesh)->max[1] = (*mesh)->delta[0] = (*mesh)->delta[1] = 0.0;
 
   return DMG_SUCCESS;
 }
