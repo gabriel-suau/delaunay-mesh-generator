@@ -102,14 +102,20 @@ int DMG_setAdja(DMG_pMesh mesh) {
 
       iadj = 3 * i + j;
 
-      while (key != DMG_UNSET) {
+      do {
         hedge = &htab[key];
         if (hedge->a == vmin && hedge->b == vmax) {
-          if (hedge->adj1 == iadj) mesh->adja[iadj] = hedge->adj2;
-          else mesh->adja[iadj] = hedge->adj1;
+          if (hedge->adj1 == iadj) {
+            mesh->adja[iadj] = hedge->adj2;
+          } else {
+            mesh->adja[iadj] = hedge->adj1;
+          }
           break;
         }
-      }
+        else {
+          key = htab[key].nxt;
+        }
+      } while (key != DMG_UNSET);
     }
   }
 

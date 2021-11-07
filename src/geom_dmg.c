@@ -135,20 +135,20 @@ int DMG_locTria_bary(DMG_pMesh mesh, int start, double c[2], double bc[3]) {
 }
 
 
-int DMG_createCavity(DMG_pMesh mesh, double d[2], int it, int *list) {
+int DMG_createCavity(DMG_pMesh mesh, double d[2], int *list) {
   DMG_Queue *q;
   DMG_pTria pt;
   int k, jt, count, iadj, *adja;
   double *a, *b, *c;
 
-  list[0] = it;
-  count = 1;
+  jt = list[0];
+  count = 0;
 
   /* BFS */
   q = DMG_createQueue();
-  pt = &mesh->tria[it];
+  pt = &mesh->tria[jt];
   pt->flag = 1;
-  DMG_enQueue(q, it);
+  DMG_enQueue(q, jt);
 
   while (!DMG_qIsEmpty(q)) {
     jt = DMG_deQueue(q);
