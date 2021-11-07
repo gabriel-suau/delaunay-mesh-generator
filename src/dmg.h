@@ -24,7 +24,7 @@ double DMG_inCircle(double a[2], double b[2], double c[2], double d[2]);
 int DMG_baryCoord(DMG_pMesh mesh, DMG_pTria pt, double c[2], double *det, double bc[3]);
 int DMG_locTria(DMG_pMesh mesh, int start, double c[2]);
 int DMG_locTria_bary(DMG_pMesh mesh, int start, double c[2], double bc[3]);
-int DMG_createCavity(DMG_pMesh mesh, double d[2], int it, int *list);
+int DMG_createCavity(DMG_pMesh mesh, double d[2], int *list);
 
 /* Quality */
 double DMG_computeTriaArea(DMG_pMesh mesh, DMG_pTria pt);
