@@ -8,12 +8,12 @@ int DMG_hashHedge(DMG_pMesh mesh, DMG_Hedge *htab) {
   DMG_pTria pt;
   DMG_Hedge *hedge;
 
-  if (!mesh || !mesh->np || !mesh->nt) {
+  if (mesh == NULL || !mesh->np || !mesh->nt) {
     fprintf(stderr, "Error : %s:%d : Cannot hash the edges of an empty mesh ! \n", __func__, __LINE__);
     return DMG_FAILURE;
   }
-  if (!htab || sizeof(htab) != 3 * mesh->nt * sizeof(DMG_Hedge)) {
-    fprintf(stderr, "Error : %s:%d : hash table not allocated or allocated with the wrong size ! \n", __func__, __LINE__);
+  if (htab == NULL) {
+    fprintf(stderr, "Error : %s:%d : hash table not allocated ! \n", __func__, __LINE__);
     return DMG_FAILURE;
   }
 
@@ -23,8 +23,8 @@ int DMG_hashHedge(DMG_pMesh mesh, DMG_Hedge *htab) {
     pt = &mesh->tria[i];
     /* Run through the edges of the triangle */
     for (j = 0 ; j < 3 ; j++) {
-      a = pt->v[(j + 1)%3];
-      b = pt->v[(j + 2)%3];
+      a = pt->v[DMG_tria_vert[j+1]];
+      b = pt->v[DMG_tria_vert[j+2]];
       vmin = MIN2(a, b);
       vmax = MAX2(a, b);
 
@@ -93,8 +93,8 @@ int DMG_setAdja(DMG_pMesh mesh) {
   for (i = 0 ; i < mesh->nt ; i++) {
     pt = &mesh->tria[i];
     for (j = 0 ; j < 3 ; j++) {
-      a = pt->v[(j + 1)%3];
-      b = pt->v[(j + 2)%3];
+      a = pt->v[DMG_tria_vert[j+1]];
+      b = pt->v[DMG_tria_vert[j+2]];
       vmin = MIN2(a, b);
       vmax = MAX2(a, b);
 
