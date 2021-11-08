@@ -50,3 +50,63 @@ int DMG_Free_mesh(DMG_pMesh mesh) {
 
   return DMG_SUCCESS;
 }
+
+
+int DMG_allocMesh(DMG_pMesh mesh) {
+  int i;
+
+  mesh->npmax = MAX2(1.5 * mesh->np, DMG_NPMAX);
+  mesh->ntmax = MAX2(1.5 * mesh->nt, DMG_NTMAX);
+  mesh->namax = mesh->na;
+
+  mesh->point = (DMG_pPoint) calloc(mesh->npmax, sizeof(DMG_Point));
+  mesh->edge = (DMG_pEdge) calloc(mesh->namax, sizeof(DMG_Edge));
+  mesh->tria = (DMG_pTria) calloc(mesh->ntmax, sizeof(DMG_Tria));
+
+  if (mesh->point == NULL || mesh->edge == NULL || mesh->tria == NULL)
+    return DMG_FAILURE;
+
+  mesh->npu = mesh->np;
+  mesh->nau = 0;
+  mesh->ntu = mesh->nt;
+
+  /* Set the tmp field of the unused point to be equal to the next unused point */
+  /* This is used to keep track of the empty available points */
+  for (i = mesh->npu ; i < mesh->npmax-1 ; i++) {
+    mesh->point[i].tmp = i + 1;
+  }
+
+  return DMG_SUCCESS;
+}
+
+
+int DMG_newPoint(DMG_pMesh mesh, double c[2]) {
+  DMG_pPoint ppt;
+  int ip;
+
+  /* No memory available for a new point */
+  if (!mesh->npu) return 0;
+
+  /* New point takes the first available slot in the point array */
+  ip = mesh->npu;
+
+  if (mesh->npu >= mesh->np) mesh->np = mesh->npu + 1;
+  ppt = &mesh->point[ip];
+  memcpy(ppt->c, c, 2 * sizeof(double));
+  mesh->npu = ppt->tmp;
+  ppt->tmp = 0;
+
+  return ip;
+}
+
+
+void DMG_delPoint(DMG_pMesh mesh, int ip) {
+  DMG_pPoint ppt;
+
+  ppt = &mesh->point[ip];
+  memset(ppt, 0, sizeof(DMG_Point));
+  ppt->tmp = mesh->npu;
+
+  mesh->npu = ip;
+  if (ip == mesh->np - 1) mesh->np--;
+}
