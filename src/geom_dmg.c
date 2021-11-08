@@ -164,10 +164,11 @@ int DMG_createCavity(DMG_pMesh mesh, double d[2], int *list) {
     if (DMG_inCircle(a, b, c, d) > DMG_EPSILON) {
       list[count++] = jt;
       for (k = 0 ; k < 3 ; k++) {
-        pt = &mesh->tria[adja[k]];
+        jt = adja[k] / 3;
+        pt = &mesh->tria[jt];
         if (!pt->flag) {
           pt->flag = 1;
-          DMG_enQueue(q, adja[k]);
+          DMG_enQueue(q, jt);
         }
       }
     }
