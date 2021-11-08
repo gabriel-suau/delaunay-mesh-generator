@@ -14,18 +14,11 @@
 
 #define DMG_UNSET -1
 
-#define DMG_EPSILON 1e-16
-
-#define DMG_ALPHA_2D 3.464101615137755 /* 6. / sqrt(3.) */
-
-#define MAX2(a,b) (((a) > (b)) ? (a) : (b))
-#define MIN2(a,b) (((a) < (b)) ? (a) : (b))
-#define ABS(a) (((a) > 0.) ? (a) : (-a))
-
 typedef struct {
   double c[2];
   int ref;
   int flag; /* Flag to tell il the point has been inserted in the triangulation */
+  int tmp; /*  */
 } DMG_Point;
 typedef DMG_Point* DMG_pPoint;
 
