@@ -76,9 +76,13 @@ int DMG_setAdja(DMG_pMesh mesh) {
     fprintf(stderr, "Error : %s:%d : Cannot build the adjacency table of an empty mesh ! \n", __func__, __LINE__);
     return DMG_FAILURE;
   }
+  if (mesh->adja == NULL) {
+    fprintf(stderr, "Error : %s:%d : Adjacency table not allocated ! \n", __func__, __LINE__);
+    return DMG_FAILURE;
+  }
 
   /** Create the hash table for the edges */
-  htab = (DMG_Hedge*) calloc(3 * mesh->nt, sizeof(DMG_Hedge));
+  htab = (DMG_Hedge*) calloc(3 * mesh->ntmax, sizeof(DMG_Hedge));
 
   for (i = 0 ; i < 3 * mesh->nt ; i++) {
     htab[i] = (DMG_Hedge) {DMG_UNSET, DMG_UNSET, DMG_UNSET, DMG_UNSET, DMG_UNSET};
@@ -87,7 +91,6 @@ int DMG_setAdja(DMG_pMesh mesh) {
   DMG_hashHedge(mesh, htab);
 
   /** Build the triangles adjacency table using the edge hash table*/
-  mesh->adja = (int*) calloc(3 * mesh->nt, sizeof(int));
   hsize = mesh->np;
 
   for (i = 0 ; i < mesh->nt ; i++) {

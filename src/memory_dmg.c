@@ -10,9 +10,9 @@ int DMG_Init_mesh(DMG_pMesh *mesh) {
   }
 
   (*mesh)->ver = (*mesh)->dim = DMG_UNSET;
-  (*mesh)->np = (*mesh)->na = (*mesh)->nt = DMG_UNSET;
-  (*mesh)->npu = (*mesh)->nau = (*mesh)->ntu = DMG_UNSET;
-  (*mesh)->npmax = (*mesh)->namax = (*mesh)->ntmax = DMG_UNSET;
+  (*mesh)->np = (*mesh)->na = (*mesh)->nt = 0;
+  (*mesh)->npu = (*mesh)->nau = (*mesh)->ntu = 0;
+  (*mesh)->npmax = (*mesh)->namax = (*mesh)->ntmax = 0;
   (*mesh)->min[0] = (*mesh)->min[1] = DBL_MAX;
   (*mesh)->max[0] = (*mesh)->max[1] = -DBL_MAX;
 
@@ -75,6 +75,12 @@ int DMG_allocMesh(DMG_pMesh mesh) {
   for (i = mesh->npu ; i < mesh->npmax-1 ; i++) {
     mesh->point[i].tmp = i + 1;
   }
+  for (i = mesh->ntu ; i < mesh->ntmax-1 ; i++) {
+    mesh->tria[i].v[2] = i + 1;
+  }
+
+  /* Allocate the adjacency table */
+  mesh->adja = (int*) calloc(3 * mesh->ntmax, sizeof(int));
 
   return DMG_SUCCESS;
 }
@@ -85,7 +91,7 @@ int DMG_newPoint(DMG_pMesh mesh, double c[2]) {
   int ip;
 
   /* No memory available for a new point */
-  if (!mesh->npu) return 0;
+  if (mesh->npu == DMG_UNSET) return 0;
 
   /* New point takes the first available slot in the point array */
   ip = mesh->npu;
@@ -109,4 +115,43 @@ void DMG_delPoint(DMG_pMesh mesh, int ip) {
 
   mesh->npu = ip;
   if (ip == mesh->np - 1) mesh->np--;
+}
+
+
+int DMG_newTria(DMG_pMesh mesh) {
+  DMG_pTria pt;
+  int it;
+
+  if (mesh->ntu == DMG_UNSET) return 0;
+
+  /* New tria takes the first available slot in the tria array */
+  it = mesh->ntu;
+
+  if (mesh->ntu >= mesh->nt) mesh->nt = mesh->ntu + 1;
+
+  pt = &mesh->tria[it];
+  mesh->ntu = pt->v[2];
+  pt->v[2] = 0;
+  pt->ref = 0;
+  pt->flag = 0;
+
+  return it;
+}
+
+
+void DMG_delTria(DMG_pMesh mesh, int it) {
+  DMG_pTria pt;
+  int iadj;
+
+  pt = &mesh->tria[it];
+  memset(pt, 0, sizeof(DMG_Tria));
+  pt->v[2] = mesh->ntu;
+  pt->qual = 0.0;
+
+  iadj = 3 * it;
+  if (mesh->adja)
+    memset(&mesh->adja[iadj], 0, 3 * sizeof(int));
+
+  mesh->ntu = it;
+  if (it == mesh->nt - 1) mesh->nt--;
 }
