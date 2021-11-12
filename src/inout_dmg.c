@@ -111,6 +111,11 @@ int DMG_loadMesh_medit(DMG_pMesh mesh, char *filename) {
 
   fclose(file);
 
+  /* Print the nmber of entities */
+  fprintf(stdout, "%d/%d (%d) vertices \n", mesh->np, mesh->npmax, mesh->npu);
+  fprintf(stdout, "%d/%d (%d) edges \n", mesh->na, mesh->namax, mesh->nau);
+  fprintf(stdout, "%d/%d (%d) triangles \n", mesh->nt, mesh->ntmax, mesh->ntu);
+
   return DMG_SUCCESS;  
 }
 
