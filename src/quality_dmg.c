@@ -47,7 +47,7 @@ int DMG_computeQual(DMG_pMesh mesh) {
   int i;
   DMG_pTria pt;
 
-  for (i = 0; i < mesh->nt ; i++) {
+  for (i = 1; i <= mesh->nt ; i++) {
     pt = &mesh->tria[i];
     pt->qual = DMG_ALPHA_2D * DMG_computeTriaQual(mesh, pt);
   }
@@ -69,7 +69,7 @@ int DMG_displayQualHisto(DMG_pMesh mesh, int nclass) {
 
   memset(hist, 0, nclass * sizeof(int));
 
-  for (i = 0 ; i < mesh->nt ; i++) {
+  for (i = 1 ; i <= mesh->nt ; i++) {
     pt = &mesh->tria[i];
     qual = pt->qual;
     qualavg += qual;

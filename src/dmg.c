@@ -5,8 +5,7 @@ int main(int argc, char **argv)
 {
   DMG_Mesh* mesh;
   char *filein, *fileout, *qualout;
-  int nclass = 5, list[64], i;
-  double c[2];
+  int nclass = 5;
 
   mesh = NULL;
   filein = fileout = qualout = NULL;

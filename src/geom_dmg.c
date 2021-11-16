@@ -174,5 +174,10 @@ int DMG_createCavity(DMG_pMesh mesh, double d[2], int *list) {
     }
   }
 
+  /* Create the cavity by deleting the triangles */
+  for (k = 0 ; k < count ; k++) {
+    DMG_delTria(mesh, list[k]);
+  }
+
   return DMG_SUCCESS;
 }

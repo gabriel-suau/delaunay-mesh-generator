@@ -19,7 +19,7 @@ int DMG_hashHedge(DMG_pMesh mesh, DMG_Hedge *htab) {
 
   hnxt = hsize = mesh->np;
 
-  for (i = 0 ; i < mesh->nt ; i++) {
+  for (i = 1 ; i <= mesh->nt ; i++) {
     pt = &mesh->tria[i];
     /* Run through the edges of the triangle */
     for (j = 0 ; j < 3 ; j++) {
@@ -33,7 +33,7 @@ int DMG_hashHedge(DMG_pMesh mesh, DMG_Hedge *htab) {
       iadj = 3 * i + j;
 
       /* If the key does not exist, create the first hedge corresponding to this key */
-      if (htab[key].a == DMG_UNSET) {
+      if (htab[key].a == 0) {
         htab[key].a = vmin;
         htab[key].b = vmax;
         htab[key].adj1 = iadj;
@@ -50,7 +50,7 @@ int DMG_hashHedge(DMG_pMesh mesh, DMG_Hedge *htab) {
             break;
           }
           key = hedge->nxt;
-        } while (key != DMG_UNSET);
+        } while (key != 0);
         /* If not found, create the hedge object and set the nxt field of the last seen hedge object to point to this hedge */
         if (!flag) {
           htab[hnxt].a = vmin;
@@ -82,18 +82,14 @@ int DMG_setAdja(DMG_pMesh mesh) {
   }
 
   /** Create the hash table for the edges */
-  htab = (DMG_Hedge*) calloc(3 * mesh->ntmax, sizeof(DMG_Hedge));
-
-  for (i = 0 ; i < 3 * mesh->nt ; i++) {
-    htab[i] = (DMG_Hedge) {DMG_UNSET, DMG_UNSET, DMG_UNSET, DMG_UNSET, DMG_UNSET};
-  }
+  htab = (DMG_Hedge*) calloc(3 * (mesh->ntmax + 1), sizeof(DMG_Hedge));
 
   DMG_hashHedge(mesh, htab);
 
   /** Build the triangles adjacency table using the edge hash table*/
   hsize = mesh->np;
 
-  for (i = 0 ; i < mesh->nt ; i++) {
+  for (i = 1 ; i <= mesh->nt ; i++) {
     pt = &mesh->tria[i];
     for (j = 0 ; j < 3 ; j++) {
       a = pt->v[DMG_tria_vert[j+1]];
@@ -118,9 +114,11 @@ int DMG_setAdja(DMG_pMesh mesh) {
         else {
           key = htab[key].nxt;
         }
-      } while (key != DMG_UNSET);
+      } while (key != 0);
     }
   }
+
+  free(htab);
 
   return DMG_SUCCESS;
 }

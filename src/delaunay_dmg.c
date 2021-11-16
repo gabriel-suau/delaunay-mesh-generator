@@ -5,7 +5,7 @@ int DMG_delaunay(DMG_pMesh mesh) {
 
   DMG_initDelaunay(mesh);
 
-  DMG_insertBdryPoints(mesh);
+  /* DMG_insertBdryPoints(mesh); */
 
   return DMG_SUCCESS;
 }
@@ -18,7 +18,7 @@ int DMG_initDelaunay(DMG_pMesh mesh) {
   double c[2], delta[2];
 
   /* Compute the bounding box and set the min and max fields */
-  for (i = 0 ; i < mesh->np ; i++) {
+  for (i = 1 ; i <= mesh->np ; i++) {
     ppt = &mesh->point[i];
     if (ppt->c[0] < mesh->min[0]) mesh->min[0] = ppt->c[0];
     if (ppt->c[0] > mesh->max[0]) mesh->max[0] = ppt->c[0];
@@ -50,10 +50,10 @@ int DMG_initDelaunay(DMG_pMesh mesh) {
   c[1] = mesh->max[1] + 0.1 * delta[1];
   ip4 = DMG_newPoint(mesh, c);
 
-  assert ( ip1 == mesh->np-4 );
-  assert ( ip2 == mesh->np-3 );
-  assert ( ip3 == mesh->np-2 );
-  assert ( ip4 == mesh->np-1 );
+  assert ( ip1 == mesh->np-3 );
+  assert ( ip2 == mesh->np-2 );
+  assert ( ip3 == mesh->np-1 );
+  assert ( ip4 == mesh->np );
 
   /* Create the 2 first triangles */
   it1 = DMG_newTria(mesh);
@@ -68,10 +68,8 @@ int DMG_initDelaunay(DMG_pMesh mesh) {
   pt->v[1] = ip2;
   pt->v[2] = ip4;
 
-  printf("%d, %d \n", it1, it2);
-
-  assert( it1 == mesh->nt-2 );
-  assert( it2 == mesh->nt-1 );
+  assert( it1 == mesh->nt-1 );
+  assert( it2 == mesh->nt );
 
   /* Adjacency relations */
   iadj = 3 * it1;
@@ -88,21 +86,17 @@ int DMG_initDelaunay(DMG_pMesh mesh) {
 
 int DMG_insertBdryPoints(DMG_pMesh mesh) {
   DMG_pPoint ppt;
-  int i, k, list[64];
+  int i, list[64];
 
-  for (i = 0 ; i < 64 ; i++) {
-    list[i] = DMG_UNSET;
-  }
-  list[0] = 0;
+  memset(list, 0, 64 * sizeof(int));
 
-  for (i = 0 ; i < mesh->np - 4 ; i++) {
+  list[0] = 1;
+
+  for (i = 1 ; i <= mesh->np - 4 ; i++) {
     ppt = &mesh->point[i];
     ppt->flag = 1;
     list[0] = DMG_locTria(mesh, list[0], ppt->c);
     DMG_createCavity(mesh, ppt->c, list);
-    for (k = 0; k < 64 ; k++) {
-      
-    }
   }
 
   return DMG_SUCCESS;
