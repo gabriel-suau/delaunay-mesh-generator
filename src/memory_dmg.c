@@ -28,17 +28,17 @@ int DMG_Free_mesh(DMG_pMesh mesh) {
   if (mesh->point) {
     free(mesh->point);
     mesh->point = NULL;
-    mesh->np = DMG_UNSET;
+    mesh->np = 0;
   }
   if (mesh->edge) {
     free(mesh->edge);
     mesh->edge = NULL;
-    mesh->na = DMG_UNSET;
+    mesh->na = 0;
   }
   if (mesh->tria) {
     free(mesh->tria);
     mesh->edge = NULL;
-    mesh->nt = DMG_UNSET;
+    mesh->nt = 0;
   }
   if (mesh->adja) {
     free(mesh->adja);

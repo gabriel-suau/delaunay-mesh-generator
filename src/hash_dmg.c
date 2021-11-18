@@ -122,3 +122,91 @@ int DMG_setAdja(DMG_pMesh mesh) {
 
   return DMG_SUCCESS;
 }
+
+
+int DMG_createCavity(DMG_pMesh mesh, double d[2], int start, int *adjlist) {
+  DMG_Queue *q;
+  DMG_pTria pt;
+  int k, jt, incount, adjcount, iadj, *adja, inlist[DMG_LIST_SIZE];
+  double *a, *b, *c;
+
+  memset(inlist, 0, DMG_LIST_SIZE * sizeof(int));
+
+  jt = start;
+  incount = adjcount = 0;
+
+  /* BFS */
+  q = DMG_createQueue();
+  pt = &mesh->tria[jt];
+  pt->flag = 1;
+  DMG_enQueue(q, jt);
+
+  while (!DMG_qIsEmpty(q)) {
+    jt = DMG_deQueue(q);
+    pt = &mesh->tria[jt];
+
+    iadj = 3 * jt;
+    adja = &mesh->adja[iadj];
+
+    a = mesh->point[pt->v[0]].c;
+    b = mesh->point[pt->v[1]].c;
+    c = mesh->point[pt->v[2]].c;
+
+    /* Si le triangle ne verifie pas le critere de delaunay, ajouter son indice dans la liste de la cavite et mettre ses voisins qui n'ont pas encore été visités dans la queue. */
+    if (DMG_inCircle(a, b, c, d) > DMG_EPSILON) {
+      pt->flag = 2;
+      inlist[incount++] = jt;
+      for (k = 0 ; k < 3 ; k++) {
+        jt = adja[k] / 3;
+        if (!jt) continue; /* Domain boundary */
+        pt = &mesh->tria[jt];
+        if (!pt->flag) {
+          pt->flag = 1;
+          DMG_enQueue(q, jt);
+        }
+      }
+    }
+    /* Sinon, récupérer la (ou les) relation(s) d'adjacence par la(les)quelle(s) le triangle voit la cavité */
+    else {
+      for (k = 0 ; k < 3 ; k++) {
+        jt = adja[k] / 3;
+        if (!jt) continue;
+        pt = &mesh->tria[jt];
+        if (pt->flag == 2) adjlist[adjcount++] = iadj + k;
+      }
+    }
+  }
+
+  /* Create the cavity by deleting the triangles */
+  for (k = 0 ; k < incount ; k++) {
+    DMG_delTria(mesh, inlist[k]);
+  }
+
+  for (k = 0 ; k < adjcount ; k++) {
+    mesh->tria[adjlist[k]].flag = 0;
+  }
+
+  return adjcount;
+}
+
+int DMG_createBall(DMG_pMesh mesh, int ip, int adjcount, int *list) {
+  DMG_pTria pt;
+  int k, iadj, a, b, it;
+
+  for (k = 0 ; k < adjcount ; k++) {
+    iadj = list[k];
+    if (iadj == 0) break;
+    pt = &mesh->tria[iadj / 3];
+    iadj %= 3;
+    a = pt->v[DMG_tria_vert[iadj+1]];
+    b = pt->v[DMG_tria_vert[iadj+2]];
+    it = DMG_newTria(mesh);
+    pt = &mesh->tria[it];
+    pt->v[0] = ip;
+    pt->v[1] = b;
+    pt->v[2] = a;
+    list[k] = it;
+  }
+
+  return DMG_SUCCESS;
+}

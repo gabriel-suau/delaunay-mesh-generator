@@ -65,7 +65,7 @@ int DMG_displayQualHisto(DMG_pMesh mesh, int nclass) {
   qualmin = 2.;
   qualmax = 0.;
   qualavg = 0.;
-  itmin = DMG_UNSET;
+  itmin = 0;
 
   memset(hist, 0, nclass * sizeof(int));
 
