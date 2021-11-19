@@ -2,8 +2,8 @@
 
 #define DMG_EPSTRIA -1e-18
 
-
-double DMG_orient(double a[2], double b[2], double c[2]) {
+double DMG_orient(double a[2], double b[2], double c[2])
+{
   double abx, aby, acx, acy;
 
   abx = b[0] - a[0];
@@ -14,8 +14,8 @@ double DMG_orient(double a[2], double b[2], double c[2]) {
   return abx * acy - aby * acx;
 }
 
-
-double DMG_inCircle(double a[2], double b[2], double c[2], double d[2]) {
+double DMG_inCircle(double a[2], double b[2], double c[2], double d[2])
+{
   double adx, ady, bdx, bdy, cdx, cdy;
   double abdet, bcdet, cadet;
   double adsq, bdsq, cdsq;
@@ -37,10 +37,10 @@ double DMG_inCircle(double a[2], double b[2], double c[2], double d[2]) {
   return adsq * bcdet + bdsq * cadet + cdsq * abdet;
 }
 
-
 /* Compute the barycentric coordinates of point c in triangle pt */
 /* Also return 1 if c is in triangle, 0 if c is not in triangle */
-int DMG_baryCoord(DMG_pMesh mesh, DMG_pTria pt, double c[2], double *det, double bc[3]) {
+int DMG_baryCoord(DMG_pMesh mesh, DMG_pTria pt, double c[2], double *det, double bc[3])
+{
   double *pa, *pb, *pc;
 
   pa = mesh->point[pt->v[0]].c;
@@ -62,7 +62,43 @@ int DMG_baryCoord(DMG_pMesh mesh, DMG_pTria pt, double c[2], double *det, double
     return 0;
 }
 
-int DMG_locTria(DMG_pMesh mesh, int start, double c[2]) {
+int DMG_locTria_brute(DMG_pMesh mesh, double c[2])
+{
+  DMG_pTria pt;
+  double *a, *b;
+  int it, iter, i;
+
+  iter = 0;
+  int flag = 0;
+
+  /* Walk through the triangles */
+  for (int tr = 1; tr <= mesh->nt; tr++)
+  {
+    flag = 0;
+    pt = &mesh->tria[tr];
+    for (int edge = 0; edge < 3; edge++)
+    {
+      int ka = pt->v[DMG_tria_vert[edge + 1]];
+      a = mesh->point[ka].c;
+      int kb = pt->v[DMG_tria_vert[edge + 2]];
+      b = mesh->point[kb].c;
+      if (DMG_orient(a, b, c) < 0)
+      {
+        flag = 1;
+        break;
+      }
+    }
+    if (!flag)
+    {
+      return tr;
+    }
+  }
+
+  return 1; // error : point not found
+}
+
+int DMG_locTria(DMG_pMesh mesh, int start, double c[2])
+{
   DMG_pTria pt;
   double *a, *b;
   int it, iter, i, flag, iadj, *adja;
@@ -71,7 +107,8 @@ int DMG_locTria(DMG_pMesh mesh, int start, double c[2]) {
   iter = 0;
 
   /* Walk through the triangles */
-  while (iter < mesh->nt) {
+  while (iter < mesh->nt)
+  {
     pt = &mesh->tria[it];
 
     iadj = 3 * it;
@@ -80,11 +117,13 @@ int DMG_locTria(DMG_pMesh mesh, int start, double c[2]) {
     flag = 0;
 
     /* Iterate through the edges of triangle it */
-    for (i = 0 ; i < 3 ; i++) {
-      a = mesh->point[pt->v[(i+1)%3]].c;
-      b = mesh->point[pt->v[(i+2)%3]].c;
+    for (i = 0; i < 3; i++)
+    {
+      a = mesh->point[pt->v[(i + 1) % 3]].c;
+      b = mesh->point[pt->v[(i + 2) % 3]].c;
 
-      if (DMG_orient(a, b, c) < 0.0) {
+      if (DMG_orient(a, b, c) < 0.0)
+      {
         it = adja[i] / 3; /* mesh->adja[3 * it + i] */
         flag = 1;
         break;
@@ -92,15 +131,15 @@ int DMG_locTria(DMG_pMesh mesh, int start, double c[2]) {
     }
 
     /* We found the triangle containing point c */
-    if (!flag) break;
-
+    if (!flag)
+      break;
   }
 
   return it;
 }
 
-
-int DMG_locTria_bary(DMG_pMesh mesh, int start, double c[2], double bc[3]) {
+int DMG_locTria_bary(DMG_pMesh mesh, int start, double c[2], double bc[3])
+{
   DMG_pTria pt;
   double det;
   int it, j, iter, dir[3], *adja, iadj;
@@ -108,11 +147,13 @@ int DMG_locTria_bary(DMG_pMesh mesh, int start, double c[2], double bc[3]) {
   it = start;
   iter = 0;
 
-  while (iter < mesh->nt) {
-    pt  = &mesh->tria[it];
+  while (iter < mesh->nt)
+  {
+    pt = &mesh->tria[it];
 
     /* Compute the barycentric coordinates of point c in triangle it */
-    if (DMG_baryCoord(mesh, pt, c, &det, bc)) break;
+    if (DMG_baryCoord(mesh, pt, c, &det, bc))
+      break;
 
     dir[0] = (bc[0] < -DMG_EPSILON) ? 1 : 0;
     dir[1] = (bc[1] < -DMG_EPSILON) ? 1 : 0;
@@ -121,8 +162,10 @@ int DMG_locTria_bary(DMG_pMesh mesh, int start, double c[2], double bc[3]) {
     iadj = 3 * it;
     adja = &mesh->adja[iadj];
 
-    for (j = 0 ; j < 3 ; j++) {
-      if (dir[j]) {
+    for (j = 0; j < 3; j++)
+    {
+      if (dir[j])
+      {
         it = adja[j] / 3; /* mesh->adja[iadj + j] / 3 */
         break;
       }
