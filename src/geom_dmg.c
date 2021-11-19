@@ -62,6 +62,7 @@ int DMG_baryCoord(DMG_pMesh mesh, DMG_pTria pt, double c[2], double *det, double
     return 0;
 }
 
+
 int DMG_locTria_brute(DMG_pMesh mesh, double c[2])
 {
   DMG_pTria pt;
@@ -97,8 +98,8 @@ int DMG_locTria_brute(DMG_pMesh mesh, double c[2])
   return 1; // error : point not found
 }
 
-int DMG_locTria(DMG_pMesh mesh, int start, double c[2])
-{
+
+int DMG_locTria(DMG_pMesh mesh, int start, double c[2]) {
   DMG_pTria pt;
   double *a, *b;
   int it, iter, i, flag, iadj, *adja;
@@ -130,9 +131,10 @@ int DMG_locTria(DMG_pMesh mesh, int start, double c[2])
       }
     }
 
+    iter++;
+
     /* We found the triangle containing point c */
-    if (!flag)
-      break;
+    if (!flag) break;
   }
 
   return it;
