@@ -124,16 +124,16 @@ int DMG_setAdja(DMG_pMesh mesh) {
 }
 
 
-int DMG_createCavity(DMG_pMesh mesh, double d[2], int start, int *adjlist) {
+int DMG_createCavity(DMG_pMesh mesh, double d[2], int start, int *ptlist) {
   DMG_Queue *q;
   DMG_pTria pt;
-  int k, jt, incount, adjcount, iadj, *adja, inlist[DMG_LIST_SIZE];
+  int k, jt, incount, ptcount, iadj, *adja, inlist[DMG_LIST_SIZE];
   double *a, *b, *c;
 
   memset(inlist, 0, DMG_LIST_SIZE * sizeof(int));
 
   jt = start;
-  incount = adjcount = 0;
+  incount = ptcount = 0;
 
   /* BFS */
   q = DMG_createQueue();
@@ -158,7 +158,10 @@ int DMG_createCavity(DMG_pMesh mesh, double d[2], int start, int *adjlist) {
       inlist[incount++] = jt;
       for (k = 0 ; k < 3 ; k++) {
         jt = adja[k] / 3;
-        if (!jt) continue; /* Domain boundary */
+        /* Domain boundary : recuperer l'arete de la frontiere*/
+        if (!jt) {
+          
+        }
         pt = &mesh->tria[jt];
         if (!pt->flag) {
           pt->flag = 1;
@@ -166,27 +169,32 @@ int DMG_createCavity(DMG_pMesh mesh, double d[2], int start, int *adjlist) {
         }
       }
     }
-    /* Sinon, récupérer la (ou les) relation(s) d'adjacence par la(les)quelle(s) le triangle voit la cavité */
+    /* Sinon, récupérer l'arete par lesquelles le triangle voit la cavité */
     else {
       for (k = 0 ; k < 3 ; k++) {
         jt = adja[k] / 3;
         if (!jt) continue;
         pt = &mesh->tria[jt];
-        if (pt->flag == 2) adjlist[adjcount++] = iadj + k;
+        if (pt->flag == 2) {
+          ptlist[ptcount++] = pt->v[DMG_tria_vert[k+1]];
+          ptlist[ptcount++] = pt->v[DMG_tria_vert[k+2]];
+        }
       }
     }
   }
+
+  DMG_freeQueue(q);
 
   /* Create the cavity by deleting the triangles */
   for (k = 0 ; k < incount ; k++) {
     DMG_delTria(mesh, inlist[k]);
   }
 
-  for (k = 0 ; k < adjcount ; k++) {
-    mesh->tria[adjlist[k]].flag = 0;
-  }
+  /* for (k = 0 ; k < adjcount ; k++) { */
+  /*   mesh->tria[adjlist[k]].flag = 0; */
+  /* } */
 
-  return adjcount;
+  /* return adjcount; */
 }
 
 int DMG_createBall(DMG_pMesh mesh, int ip, int adjcount, int *list) {
