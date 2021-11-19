@@ -3,17 +3,30 @@
 DMG_Queue* DMG_createQueue() {
   DMG_Queue* q = (DMG_Queue*)malloc(sizeof(DMG_Queue));
 
-  if (!q) return NULL;
+  if (q == NULL) return NULL;
 
   q->front = q->rear = NULL;
 
   return q;
 }
 
+
+void DMG_freeQueue(DMG_Queue *q) {
+
+  if (q == NULL) return;
+
+  while(!DMG_qIsEmpty(q)) {
+    DMG_deQueue(q);
+  }
+
+  free(q);
+  q = NULL;
+}
+
 DMG_Qnode* DMG_newNode(int k) {
   DMG_Qnode* node = (DMG_Qnode*)malloc(sizeof(DMG_Qnode));
 
-  if (!node) return NULL;
+  if (node == NULL) return NULL;
 
   node->key = k;
   node->next = NULL;

@@ -65,8 +65,9 @@ int DMG_createCavity(DMG_pMesh mesh, double d[2], int start, int *adjlist);
 int DMG_createBall(DMG_pMesh mesh, int ip, int adjcount, int *list);
 
 /* Queue manipulations */
-DMG_Queue *DMG_createQueue();
-DMG_Qnode *DMG_newNode(int k);
+DMG_Queue* DMG_createQueue();
+void DMG_freeQueue(DMG_Queue *q);
+DMG_Qnode* DMG_newNode(int k);
 int DMG_enQueue(DMG_Queue *q, int k);
 int DMG_deQueue(DMG_Queue *q);
 int DMG_qFront(DMG_Queue *q);
