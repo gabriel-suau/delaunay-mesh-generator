@@ -67,31 +67,26 @@ int DMG_locTria_brute(DMG_pMesh mesh, double c[2])
 {
   DMG_pTria pt;
   double *a, *b;
-  int it, iter, i;
-
-  iter = 0;
-  int flag = 0;
+  int it, k, flag;
 
   /* Walk through the triangles */
-  for (int tr = 1; tr <= mesh->nt; tr++)
-  {
+  for (it = 1; it <= mesh->nt; it++) {
+    pt = &mesh->tria[it];
+
     flag = 0;
-    pt = &mesh->tria[tr];
-    for (int edge = 0; edge < 3; edge++)
-    {
-      int ka = pt->v[DMG_tria_vert[edge + 1]];
-      a = mesh->point[ka].c;
-      int kb = pt->v[DMG_tria_vert[edge + 2]];
-      b = mesh->point[kb].c;
-      if (DMG_orient(a, b, c) < 0)
-      {
+
+    for (k = 0; k < 3; k++) {
+      a = mesh->point[pt->v[DMG_tria_vert[k+1]]].c;
+      b = mesh->point[pt->v[DMG_tria_vert[k+2]]].c;
+
+      if (DMG_orient(a, b, c) < 0) {
         flag = 1;
         break;
       }
     }
-    if (!flag)
-    {
-      return tr;
+
+    if (!flag) {
+      return it;
     }
   }
 
@@ -102,14 +97,13 @@ int DMG_locTria_brute(DMG_pMesh mesh, double c[2])
 int DMG_locTria(DMG_pMesh mesh, int start, double c[2]) {
   DMG_pTria pt;
   double *a, *b;
-  int it, iter, i, flag, iadj, *adja;
+  int it, iter, k, flag, iadj, *adja;
 
   it = start;
   iter = 0;
 
   /* Walk through the triangles */
-  while (iter < mesh->nt)
-  {
+  while (iter < mesh->nt) {
     pt = &mesh->tria[it];
 
     iadj = 3 * it;
@@ -118,14 +112,12 @@ int DMG_locTria(DMG_pMesh mesh, int start, double c[2]) {
     flag = 0;
 
     /* Iterate through the edges of triangle it */
-    for (i = 0; i < 3; i++)
-    {
-      a = mesh->point[pt->v[(i + 1) % 3]].c;
-      b = mesh->point[pt->v[(i + 2) % 3]].c;
+    for (k = 0; k < 3; k++) {
+      a = mesh->point[pt->v[DMG_tria_vert[k+1]]].c;
+      b = mesh->point[pt->v[DMG_tria_vert[k+2]]].c;
 
-      if (DMG_orient(a, b, c) < 0.0)
-      {
-        it = adja[i] / 3; /* mesh->adja[3 * it + i] */
+      if (DMG_orient(a, b, c) < 0.0) {
+        it = adja[k] / 3; /* mesh->adja[3 * it + k] */
         flag = 1;
         break;
       }
@@ -140,6 +132,7 @@ int DMG_locTria(DMG_pMesh mesh, int start, double c[2]) {
   return it;
 }
 
+
 int DMG_locTria_bary(DMG_pMesh mesh, int start, double c[2], double bc[3])
 {
   DMG_pTria pt;
@@ -149,8 +142,7 @@ int DMG_locTria_bary(DMG_pMesh mesh, int start, double c[2], double bc[3])
   it = start;
   iter = 0;
 
-  while (iter < mesh->nt)
-  {
+  while (iter < mesh->nt) {
     pt = &mesh->tria[it];
 
     /* Compute the barycentric coordinates of point c in triangle it */
@@ -164,10 +156,8 @@ int DMG_locTria_bary(DMG_pMesh mesh, int start, double c[2], double bc[3])
     iadj = 3 * it;
     adja = &mesh->adja[iadj];
 
-    for (j = 0; j < 3; j++)
-    {
-      if (dir[j])
-      {
+    for (j = 0; j < 3; j++) {
+      if (dir[j]) {
         it = adja[j] / 3; /* mesh->adja[iadj + j] / 3 */
         break;
       }
@@ -177,4 +167,34 @@ int DMG_locTria_bary(DMG_pMesh mesh, int start, double c[2], double bc[3])
   }
 
   return it;
+}
+
+
+int DMG_chkDelaunay(DMG_pMesh mesh) {
+  DMG_pTria pt;
+  int it, jt, k, iadj, *adja;
+  double *a, *b, *c, *d;
+
+  for (it = 1 ; it <= mesh->nt ; it++) {
+    pt = &mesh->tria[it];
+
+    a = mesh->point[pt->v[0]].c;
+    b = mesh->point[pt->v[1]].c;
+    c = mesh->point[pt->v[2]].c;
+
+    iadj = 3 * it;
+    adja = &mesh->adja[iadj];
+
+    for (k = 0 ; k < 3 ; k++) {
+      jt = adja[k] / 3;
+      pt = &mesh->tria[jt];
+      d = mesh->point[pt->v[DMG_tria_vert[k]]].c;
+      if (DMG_inCircle(a, b, c, d) > 0) {
+        fprintf(stderr, "Warning : element %d and vertex %d violate the delaunay criterion.", it, pt->v[DMG_tria_vert[k]]);
+        return 0;
+      }
+    }
+  }
+
+  return 1;
 }
