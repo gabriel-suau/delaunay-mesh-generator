@@ -89,18 +89,20 @@ int DMG_loadMesh_medit(DMG_pMesh mesh, char *filename) {
   }
 
   /* Triangles */
-  rewind(file);
-  fseek(file, posnt, SEEK_SET);
-  for (i = 1 ; i <= mesh->nt ; i++) {
-    pt = &mesh->tria[i];
-    fscanf(file, "%d %d %d %d", &pt->v[0], &pt->v[1], &pt->v[2], &pt->ref);
-    pt->flag = 0;
+  if (mesh->nt) {
+    rewind(file);
+    fseek(file, posnt, SEEK_SET);
+    for (i = 1 ; i <= mesh->nt ; i++) {
+      pt = &mesh->tria[i];
+      fscanf(file, "%d %d %d %d", &pt->v[0], &pt->v[1], &pt->v[2], &pt->ref);
+      pt->flag = 0;
 
-    if (DMG_computeTriaArea(mesh, pt) < 0.) {
-      tmp = pt->v[2];
-      pt->v[2] = pt->v[1];
-      pt->v[1] = tmp;
-    }
+      if (DMG_computeTriaArea(mesh, pt) < 0.) {
+        tmp = pt->v[2];
+        pt->v[2] = pt->v[1];
+        pt->v[1] = tmp;
+      }
+    }    
   }
 
   fclose(file);
