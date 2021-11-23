@@ -7,6 +7,10 @@ int DMG_delaunay(DMG_pMesh mesh) {
 
   DMG_insertBdryPoints(mesh);
 
+  DMG_forceBndry(mesh);
+
+  DMG_deleteBoundingBox(mesh);
+
   return DMG_SUCCESS;
 }
 
@@ -86,27 +90,30 @@ int DMG_initDelaunay(DMG_pMesh mesh) {
 
 int DMG_insertBdryPoints(DMG_pMesh mesh) {
   DMG_pPoint ppt;
-  int i, k, start, list[DMG_LIST_SIZE], adjcount;
-
-  memset(list, 0, DMG_LIST_SIZE * sizeof(int));
+  int i, start, list[DMG_LIST_SIZE], ptcount;
 
   start = 1;
 
   for (i = 1 ; i <= mesh->np - 4 ; i++) {
+    memset(list, 0, DMG_LIST_SIZE * sizeof(int));
     ppt = &mesh->point[i];
     ppt->flag = 1;
     start = DMG_locTria(mesh, start, ppt->c);
-    adjcount = DMG_createCavity(mesh, ppt->c, start, list);
-    printf("%d \n", adjcount);
-    for (k = 0 ; k < adjcount ; k++) {
-      printf("%d ", list[k]);
-    }
-    printf("\n");
-    /* list contains the adjacency relations by which the triangles adjacent to the cavity see the cavity */
-    DMG_createBall(mesh, i, adjcount, list);
-    /* list now contains the indices of the newly created triangles */
-    start = list[0];
+    ptcount = DMG_createCavity(mesh, ppt->c, start, list);
+    start = DMG_createBall(mesh, i, ptcount, list);
   }
+
+  return DMG_SUCCESS;
+}
+
+
+int DMG_forceBndry(DMG_pMesh mesh) {
+
+  return DMG_SUCCESS;
+}
+
+
+int DMG_deleteBoundingBox(DMG_pMesh mesh) {
 
   return DMG_SUCCESS;
 }

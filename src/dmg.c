@@ -48,6 +48,13 @@ int main(int argc, char **argv)
   /** Delaunay meshing */
   DMG_delaunay(mesh);
 
+  /** Check the validity of the mesh (delaunay criterion) */
+  if (!DMG_chkDelaunay(mesh)) {
+    fprintf(stderr, "Error : Mesh is not delaunay\n");
+    DMG_Free_mesh(mesh);
+    exit(EXIT_FAILURE);    
+  }
+
   /** Compute and display the quality of the mesh */
   DMG_computeQual(mesh);
   DMG_displayQualHisto(mesh, nclass);

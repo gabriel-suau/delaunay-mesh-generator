@@ -51,6 +51,7 @@ int DMG_baryCoord(DMG_pMesh mesh, DMG_pTria pt, double c[2], double *det, double
 int DMG_locTria(DMG_pMesh mesh, int start, double c[2]);
 int DMG_locTria_brute(DMG_pMesh mesh, double c[2]);
 int DMG_locTria_bary(DMG_pMesh mesh, int start, double c[2], double bc[3]);
+int DMG_chkDelaunay(DMG_pMesh mesh);
 
 /* Quality */
 double DMG_computeTriaArea(DMG_pMesh mesh, DMG_pTria pt);
@@ -61,8 +62,8 @@ int DMG_displayQualHisto(DMG_pMesh mesh, int nclass);
 /* Adjacency relations */
 int DMG_hashHedge(DMG_pMesh mesh, DMG_Hedge *htab);
 int DMG_setAdja(DMG_pMesh mesh);
-int DMG_createCavity(DMG_pMesh mesh, double d[2], int start, int *adjlist);
-int DMG_createBall(DMG_pMesh mesh, int ip, int adjcount, int *list);
+int DMG_createCavity(DMG_pMesh mesh, double d[2], int start, int *ptlist);
+int DMG_createBall(DMG_pMesh mesh, int ip, int ptcount, int *ptlist);
 
 /* Queue manipulations */
 DMG_Queue* DMG_createQueue();
