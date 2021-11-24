@@ -109,6 +109,7 @@ int DMG_insertBdryPoints(DMG_pMesh mesh) {
 
 int DMG_forceBndry(DMG_pMesh mesh) {
 
+  /* For each edge of the boundary, list the edges that intersect it and proceed by local swapping to recover the boundary edge */
   return DMG_SUCCESS;
 }
 
