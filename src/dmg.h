@@ -55,7 +55,7 @@ int DMG_listCrossTriangles(DMG_pMesh mesh, DMG_pEdge pa, int *tlist);
 int DMG_chkDelaunay(DMG_pMesh mesh);
 
 /* Ball computation */
-int DMG_findBall(DMG_pMesh mesh, int ip, int it, int *list);
+int DMG_findBall(DMG_pMesh mesh, int it, int iploc, int *list);
 
 /* Quality */
 double DMG_computeTriaArea(DMG_pMesh mesh, DMG_pTria pt);

@@ -14,6 +14,7 @@ int DMG_insertPoint(DMG_pMesh mesh, int ip, int start) {
   return start;
 }
 
+
 int DMG_createCavity(DMG_pMesh mesh, double d[2], int start, int *ptlist) {
   DMG_Queue *q;
   DMG_pTria pt, ptmp;
