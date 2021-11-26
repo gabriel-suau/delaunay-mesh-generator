@@ -170,6 +170,11 @@ int DMG_locTria_bary(DMG_pMesh mesh, int start, double c[2], double bc[3])
 }
 
 
+int DMG_listCrossTriangles(DMG_pMesh mesh, DMG_pEdge pa, int *tlist) {
+  return DMG_SUCCESS;
+}
+
+
 int DMG_chkDelaunay(DMG_pMesh mesh) {
   DMG_pTria pt;
   int it, jt, k, iadj, *adja;

@@ -7,7 +7,7 @@ int DMG_delaunay(DMG_pMesh mesh) {
 
   DMG_insertBdryPoints(mesh);
 
-  DMG_forceBndry(mesh);
+  DMG_enforceBndry(mesh);
 
   DMG_deleteBoundingBox(mesh);
 
@@ -89,27 +89,33 @@ int DMG_initDelaunay(DMG_pMesh mesh) {
 
 
 int DMG_insertBdryPoints(DMG_pMesh mesh) {
-  DMG_pPoint ppt;
-  int i, start, list[DMG_LIST_SIZE], ptcount;
+  int i, start;
 
   start = 1;
 
   for (i = 1 ; i <= mesh->np - 4 ; i++) {
-    memset(list, 0, DMG_LIST_SIZE * sizeof(int));
-    ppt = &mesh->point[i];
-    ppt->flag = 1;
-    start = DMG_locTria(mesh, start, ppt->c);
-    ptcount = DMG_createCavity(mesh, ppt->c, start, list);
-    start = DMG_createBall(mesh, i, ptcount, list);
+    start = DMG_insertPoint(mesh, i, start);
   }
 
   return DMG_SUCCESS;
 }
 
 
-int DMG_forceBndry(DMG_pMesh mesh) {
+int DMG_enforceBndry(DMG_pMesh mesh) {
+  DMG_pEdge pa;
+  /* DMG_pTria pt; */
+  int ia, it, nt, tlist[DMG_LIST_SIZE];
 
   /* For each edge of the boundary, list the edges that intersect it and proceed by local swapping to recover the boundary edge */
+  for (ia = 1 ; ia <=mesh->na ; ia++) {
+    pa = &mesh->edge[ia];
+    nt = DMG_listCrossTriangles(mesh, pa, tlist);
+
+    for (it = 0 ; it < nt ; it++) {
+      /* pt = &mesh->tria[tlist[it]]; */
+    }
+  }
+
   return DMG_SUCCESS;
 }
 
