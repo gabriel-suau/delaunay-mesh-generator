@@ -170,7 +170,7 @@ int DMG_saveQual_medit(DMG_pMesh mesh, char *filename);
 /* Geometric routines */
 /**
  * \param[in] a coordinates of the first point
- * \param[in] a coordinates of the second point
+ * \param[in] b coordinates of the second point
  * \param[in] c coordinates of the third point
  * \return signed area of triangle (a, b, c)
  *
