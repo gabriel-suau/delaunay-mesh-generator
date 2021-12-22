@@ -14,9 +14,9 @@
 
 #define DMG_LIST_SIZE 64
 
-#define MAX2(a, b) (((a) > (b)) ? (a) : (b))
-#define MIN2(a, b) (((a) < (b)) ? (a) : (b))
-#define ABS(a) (((a) > 0.) ? (a) : (-a))
+#define MAX2(a, b) (((a) >= (b)) ? (a) : (b))
+#define MIN2(a, b) (((a) <= (b)) ? (a) : (b))
+#define ABS(a) (((a) >= 0.) ? (a) : (-a))
 
 /* Useful to avoid modulos when going through the vertices/edges of a triangle */
 static const int DMG_tria_vert[5] = {0, 1, 2, 0, 1};
