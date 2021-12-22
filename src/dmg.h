@@ -245,7 +245,6 @@ int DMG_locTria(DMG_pMesh mesh, int start, double c[2]);
  * Find the triangle containing point c with an exhaustive search.
  */
 int DMG_locTria_brute(DMG_pMesh mesh, double c[2]);
-int DMG_listCrossTriangles(DMG_pMesh mesh, int i1, int i2, int it, int *list);
 int DMG_chkDelaunay(DMG_pMesh mesh);
 
 /* Ball computation */
