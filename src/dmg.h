@@ -307,18 +307,29 @@ int DMG_setAdja(DMG_pMesh mesh);
 /* Local modifications */
 int DMG_insertPoint(DMG_pMesh mesh, int ip, int start);
 int DMG_createCavity(DMG_pMesh mesh, double d[2], int start, int *ptlist);
-int DMG_createBall(DMG_pMesh mesh, int ip, int ptcount, int *ptlist);
+int DMG_createBall(DMG_pMesh mesh, int ip, int ptcount, const int *ptlist);
 int DMG_chkSwap(DMG_pMesh mesh, int it, int k);
-int DMG_swap(DMG_pMesh mesh, int it, int k);
+
+/**
+ * \param[in] mesh pointer toward the mesh structure
+ * \param[in] it index of the triangle
+ * \param[in] k local index of the edge to swap
+ * \param[out] ita map the old adjacencies of triangle it to the new ones
+ * \param[out] jta map the old adjacencies of triangle jt to the new ones
+ * \return index jt of the triangle adjacent to it by the swapped edge
+ *
+ * Perform the swap of local edge k of triangle it. Example :
+ * Let us consider it = (q, a, p) and jt = (q, p, b). After the swap,
+ * they become it = (q, a, b) and jt = (p, b, a). Adjacency relationships are updated so that
+ * after the swap, triangles it and jt are adjacent by their edge number 0.
+ */
+int DMG_swap(DMG_pMesh mesh, int it, int k, int ita[3], int jta[3]);
 
 /* Queue manipulations */
 DMG_Queue* DMG_createQueue();
 void DMG_freeQueue(DMG_Queue *q);
-DMG_Qnode* DMG_newNode(int k);
 int DMG_enQueue(DMG_Queue *q, int k);
 int DMG_deQueue(DMG_Queue *q);
-int DMG_qFront(DMG_Queue *q);
-int DMG_qRear(DMG_Queue *q);
 int DMG_qIsEmpty(DMG_Queue *q);
 
 #endif /* DMG_H */

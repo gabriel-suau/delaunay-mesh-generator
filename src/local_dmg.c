@@ -159,9 +159,9 @@ int DMG_chkSwap(DMG_pMesh mesh, int it, int k) {
 }
 
 
-int DMG_swap(DMG_pMesh mesh, int it, int k) {
+int DMG_swap(DMG_pMesh mesh, int it, int k, int ita[3], int jta[3]) {
   DMG_pTria pt;
-  int *adja, jt, l, itadj, jtadj, adjait[3], adjajt[3], a, p, q, d;
+  int *adja, jt, l, itadj, jtadj, adjait[3], adjajt[3], adjr, a, p, q, d;
 
   assert (k >= 0  && k < 3);
 
@@ -197,15 +197,35 @@ int DMG_swap(DMG_pMesh mesh, int it, int k) {
   /* Update the adjacency relations */
   memcpy(adjait, &mesh->adja[itadj], 3 * sizeof(int));
   memcpy(adjajt, &mesh->adja[jtadj], 3 * sizeof(int));
-  adja = &mesh->adja[itadj]; 
+
+  /* Update it adjacency */
+  adja = &mesh->adja[itadj];
   adja[0] = jtadj;
   adja[1] = adjajt[DMG_tria_vert[l+2]];
   adja[2] = adjait[DMG_tria_vert[k+1]];
+  adjr = adja[1];
+  mesh->adja[adjr] = itadj + 1;
+  adjr = adja[2];
+  mesh->adja[adjr] = itadj + 2;
+
+  /* Update jt adjacency */
   adja = &mesh->adja[jtadj];
   adja[0] = itadj;
   adja[1] = adjait[DMG_tria_vert[k+2]];
   adja[2] = adjajt[DMG_tria_vert[l+1]];
+  adjr = adja[1];
+  mesh->adja[adjr] = jtadj + 1;
+  adjr = adja[2];
+  mesh->adja[adjr] = jtadj + 2;
 
-  return DMG_SUCCESS;
+  ita[DMG_tria_vert[k]] = 0;
+  ita[DMG_tria_vert[k+1]] = itadj + 2;
+  ita[DMG_tria_vert[k+2]] = jtadj + 1;
+
+  jta[DMG_tria_vert[l]] = 0;
+  jta[DMG_tria_vert[l+1]] = jtadj + 2;
+  jta[DMG_tria_vert[l+2]] = itadj + 1;
+
+  return jt;
 
 }
