@@ -9,7 +9,9 @@ int DMG_delaunay(DMG_pMesh mesh) {
 
   DMG_enforceBndry(mesh);
 
-  /* DMG_deleteBoundingBox(mesh); */
+  DMG_markSubDomains(mesh);
+
+  DMG_packMesh(mesh);
 
   return DMG_SUCCESS;
 }

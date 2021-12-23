@@ -87,6 +87,13 @@ int DMG_newTria(DMG_pMesh mesh);
  */
 void DMG_delTria(DMG_pMesh mesh, int it);
 
+/**
+ * \param mesh pointer toward the mesh structure
+ *
+ * Pack the point/triangle arrays.
+ */
+int DMG_packMesh(DMG_pMesh mesh);
+
 /* Global mesh manipulations */
 /**
  * \param mesh pointer toward the mesh structure

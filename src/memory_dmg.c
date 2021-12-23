@@ -155,3 +155,43 @@ void DMG_delTria(DMG_pMesh mesh, int it) {
   mesh->ntu = it;
   if (it == mesh->nt) mesh->nt--;
 }
+
+int DMG_packMesh(DMG_pMesh mesh) {
+  DMG_pTria pt, pt1;
+  int it, k, iadj, *adja, *adja1;
+
+  if (!mesh->nt) {
+    return DMG_SUCCESS;
+  }
+
+  it = 1;
+  do {
+    pt = &mesh->tria[it];
+    if (!DMG_TOK(pt)) {
+      pt1 = &mesh->tria[mesh->nt];
+      memcpy(pt, pt1, sizeof(DMG_Tria));
+      iadj = 3 * it;
+      adja = &mesh->adja[iadj];
+      iadj = 3 * mesh->nt;
+      adja1 = &mesh->adja[iadj];
+      for (k = 0 ; k < 3 ; k++) {
+        adja[k] = adja1[k];
+        if (!adja[k]) continue;
+        iadj = adja[k];
+        mesh->adja[iadj] = 3 * it + k;;
+      }
+      DMG_delTria(mesh, mesh->nt);
+    }
+  } while (++it < mesh->nt);
+
+  if (mesh->nt >= mesh->ntmax - 1)
+    mesh->ntu = 0;
+  else
+    mesh->ntu = mesh->nt + 1;
+
+  if (mesh->ntu)
+    for (k = mesh->ntu ; k < mesh->ntmax - 1 ; k++)
+      mesh->tria[k].v[2] = k + 1;
+      
+  return DMG_SUCCESS;
+}
