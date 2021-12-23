@@ -345,7 +345,7 @@ int DMG_markSubDomains(DMG_pMesh mesh) {
   for (it = 1 ; it <= mesh->nt ; it++) {
     pt = &mesh->tria[it];
     if (!DMG_TOK(pt)) continue;
-    pt->flag = -1;
+    pt->ref = -1;
   }
 
   color = 0;
@@ -354,7 +354,7 @@ int DMG_markSubDomains(DMG_pMesh mesh) {
   ppt = &mesh->point[mesh->np];
   it = ppt->tmp;
   pt = &mesh->tria[it];
-  pt->flag = color;
+  pt->ref = color;
 
   q = DMG_createQueue();
   while (flag) {
@@ -371,7 +371,7 @@ int DMG_markSubDomains(DMG_pMesh mesh) {
 
       for (k = 0 ; k < 3 ; k++) {
         it = adja[k] / 3;
-        if (mesh->tria[it].flag != -1) continue;
+        if (mesh->tria[it].ref != -1) continue;
         a = pt->v[DMG_tria_vert[k+1]];
         b = pt->v[DMG_tria_vert[k+2]];
         for (ia = 1 ; ia <= mesh->na ; ia++) {
@@ -382,7 +382,7 @@ int DMG_markSubDomains(DMG_pMesh mesh) {
           }
         }
         if (ia > mesh->na) {
-          mesh->tria[it].flag = color;
+          mesh->tria[it].ref = color;
           DMG_enQueue(q, it);
         }
       }
@@ -391,7 +391,7 @@ int DMG_markSubDomains(DMG_pMesh mesh) {
     flag = 0;
 
     for (it = 1 ; it <= mesh->nt ; it++) {
-      if (mesh->tria[it].flag == -1) {
+      if (mesh->tria[it].ref == -1) {
         flag = 1;
         break;
       }
@@ -406,10 +406,16 @@ int DMG_markSubDomains(DMG_pMesh mesh) {
   for (it = 1 ; it <= mesh->nt ; it++) {
     pt = &mesh->tria[it];
     if (!DMG_TOK(pt)) continue;
-    if (pt->flag % 2 == 0) {
+    if (pt->ref % 2 == 0) {
       DMG_delTria(mesh, it);
     }
   }
+
+  /* Delete the bounding box vertices */
+  DMG_delPoint(mesh, mesh->np);
+  DMG_delPoint(mesh, mesh->np);
+  DMG_delPoint(mesh, mesh->np);
+  DMG_delPoint(mesh, mesh->np);
 
   return DMG_SUCCESS;
 }

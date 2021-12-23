@@ -3,7 +3,7 @@
 
 int main(int argc, char **argv)
 {
-  DMG_Mesh* mesh;
+  DMG_pMesh mesh;
   char *filein, *fileout, *qualout;
   int nclass = 5;
 
