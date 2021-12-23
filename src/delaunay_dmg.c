@@ -334,6 +334,80 @@ int DMG_enforceBndry(DMG_pMesh mesh) {
 
 
 int DMG_markSubDomains(DMG_pMesh mesh) {
+  DMG_pPoint ppt;
+  DMG_pEdge pa;
+  DMG_pTria pt;
+  DMG_Queue *q;
+  int it, ia, k, color, iadj, *adja, a, b, flag;
+
+  for (it = 1 ; it <= mesh->nt ; it++) {
+    pt = &mesh->tria[it];
+    if (!DMG_TOK(pt)) continue;
+    pt->flag = -1;
+  }
+
+  color = 0;
+  flag = 1;
+
+  ppt = &mesh->point[mesh->np];
+  it = ppt->tmp;
+  pt = &mesh->tria[it];
+  pt->flag = color;
+
+  q = DMG_createQueue();
+  while (flag) {
+
+    /* BFS */
+    DMG_enQueue(q, it);
+
+    while (!DMG_qIsEmpty(q)) {
+      it = DMG_deQueue(q);
+      pt = &mesh->tria[it];
+
+      iadj = 3 * it;
+      adja = &mesh->adja[iadj];
+
+      for (k = 0 ; k < 3 ; k++) {
+        it = adja[k] / 3;
+        if (mesh->tria[it].flag != -1) continue;
+        a = pt->v[DMG_tria_vert[k+1]];
+        b = pt->v[DMG_tria_vert[k+2]];
+        for (ia = 1 ; ia <= mesh->na ; ia++) {
+          pa = &mesh->edge[ia];
+          if ((a == pa->v[0] && b == pa->v[1]) ||
+              (a == pa->v[1] && b == pa->v[0])) {
+            break;
+          }
+        }
+        if (ia > mesh->na) {
+          mesh->tria[it].flag = color;
+          DMG_enQueue(q, it);
+        }
+      }
+    }
+
+    flag = 0;
+
+    for (it = 1 ; it <= mesh->nt ; it++) {
+      if (mesh->tria[it].flag == -1) {
+        flag = 1;
+        break;
+      }
+    }
+
+    color += 1;
+  }
+
+  DMG_freeQueue(q);
+
+  /* Delete all triangles whose flag is an even number */
+  for (it = 1 ; it <= mesh->nt ; it++) {
+    pt = &mesh->tria[it];
+    if (!DMG_TOK(pt)) continue;
+    if (pt->flag % 2 == 0) {
+      DMG_delTria(mesh, it);
+    }
+  }
 
   return DMG_SUCCESS;
 }
