@@ -104,9 +104,13 @@ int DMG_createCavity(DMG_pMesh mesh, double d[2], int start, int *ptlist) {
 }
 
 
-int DMG_createBall(DMG_pMesh mesh, int ip, int ptcount, int *ptlist) {
+int DMG_createBall(DMG_pMesh mesh, int ip, int ptcount, const int *ptlist) {
   DMG_pTria pt;
   int k, ia, ib, it;
+
+  it = 0;
+
+  assert(ptcount && ptlist != NULL);
 
   /* Create the triangles */
   for (k = 0 ; k < ptcount ; k+=2) {
