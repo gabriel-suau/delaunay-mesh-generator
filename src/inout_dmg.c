@@ -169,6 +169,7 @@ int DMG_saveMesh_medit(DMG_pMesh mesh, char *filename) {
   fprintf(file, "%d\n", mesh->nt);
   for (i = 1 ; i <= mesh->nt ; i++) {
     pt = &mesh->tria[i];
+    if (!DMG_TOK(pt)) continue;
     fprintf(file, "%d %d %d %d\n", pt->v[0], pt->v[1], pt->v[2], pt->ref);
   }
 
@@ -235,6 +236,7 @@ int DMG_saveMeshAs3D_medit(DMG_pMesh mesh, char *filename) {
   fprintf(file, "%d\n", mesh->nt);
   for (i = 1 ; i <= mesh->nt ; i++) {
     pt = &mesh->tria[i];
+    if (!DMG_TOK(pt)) continue;
     fprintf(file, "%d %d %d %d\n", pt->v[0], pt->v[1], pt->v[2], pt->ref);
   }
 
@@ -282,6 +284,7 @@ int DMG_saveQual_medit(DMG_pMesh mesh, char *filename) {
   fprintf(file, "1 1\n");
   for (i = 1 ; i <= mesh->nt ; i++) {
     pt = &mesh->tria[i];
+    if (!DMG_TOK(pt)) continue;
     fprintf(file, "%lf\n", pt->qual);
   }
 

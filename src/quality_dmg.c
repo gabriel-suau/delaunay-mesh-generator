@@ -49,6 +49,7 @@ int DMG_computeQual(DMG_pMesh mesh) {
 
   for (i = 1; i <= mesh->nt ; i++) {
     pt = &mesh->tria[i];
+    if (!DMG_TOK(pt)) continue;
     pt->qual = DMG_ALPHA_2D * DMG_computeTriaQual(mesh, pt);
   }
 
@@ -57,7 +58,7 @@ int DMG_computeQual(DMG_pMesh mesh) {
 
 
 int DMG_displayQualHisto(DMG_pMesh mesh, int nclass) {
-  int i, k, itmin;
+  int i, k, itmin, nt;
   DMG_pTria pt;
   double qualmin, qualmax, qualavg, qual;
   int hist[nclass];
@@ -66,11 +67,14 @@ int DMG_displayQualHisto(DMG_pMesh mesh, int nclass) {
   qualmax = 0.;
   qualavg = 0.;
   itmin = 0;
+  nt = 0;
 
   memset(hist, 0, nclass * sizeof(int));
 
   for (i = 1 ; i <= mesh->nt ; i++) {
     pt = &mesh->tria[i];
+    if (!DMG_TOK(pt)) continue;
+    nt++;
     qual = pt->qual;
     qualavg += qual;
 
@@ -88,13 +92,13 @@ int DMG_displayQualHisto(DMG_pMesh mesh, int nclass) {
   qualavg /= mesh->nt;
 
   /** Display min, max and avg quality */
-  fprintf(stdout, "\n Mesh quality   %d\n", mesh->nt);
+  fprintf(stdout, "\n Mesh quality   %d\n", nt);
   fprintf(stdout, "    MAX : %f, AVG : %f, MIN : %f (%d)\n", qualmax, qualavg, qualmin, itmin);
 
   /** Display mesh quality histogram */
   fprintf(stdout, "    HISTOGRAM \n");
   for (k = nclass - 1 ; k >= 0 ; k--) {
-    fprintf(stdout, "    %4.2f < Q < %4.2f : %4.2f %% (%d)\n", k/(float)nclass, (k+1)/(float)nclass, 100.*hist[k]/(float)mesh->nt, hist[k]);
+    fprintf(stdout, "    %4.2f < Q < %4.2f : %4.2f %% (%d)\n", k/(float)nclass, (k+1)/(float)nclass, 100.*hist[k]/(float)nt, hist[k]);
   }
 
   return DMG_SUCCESS;

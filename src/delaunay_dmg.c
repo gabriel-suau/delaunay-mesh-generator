@@ -114,6 +114,7 @@ int DMG_enforceBndry(DMG_pMesh mesh) {
   /* Set the tmp field of each point to the index of one triangle they belong to */
   for (i = 1 ; i <= mesh->nt ; i++) {
     pt = &mesh->tria[i];
+    if (!DMG_TOK(pt)) continue;
     for (k = 0 ; k < 3 ; k++) {
       mesh->point[pt->v[k]].tmp = i;
     }
