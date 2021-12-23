@@ -14,16 +14,24 @@
 
 #define DMG_UNSET -1
 
+enum DMG_Flags {
+  DMG_FLAG_NOFLAG = 0,
+  DMG_FLAG_WALK,
+  DMG_FLAG_INQUEUE,
+  DMG_FLAG_INCAV,
+};
+
 typedef struct {
   double c[2];
   int ref;
   int flag; /* Flag to tell il the point has been inserted in the triangulation */
-  int tmp; /*  */
+  int tmp;
 } DMG_Point;
 typedef DMG_Point* DMG_pPoint;
 
 typedef struct {
   int v[2];
+  int tmp;
   int ref;
 } DMG_Edge;
 typedef DMG_Edge* DMG_pEdge;
