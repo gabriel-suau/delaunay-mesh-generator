@@ -9,7 +9,7 @@ int DMG_delaunay(DMG_pMesh mesh) {
 
   DMG_enforceBndry(mesh);
 
-  DMG_deleteBoundingBox(mesh);
+  /* DMG_deleteBoundingBox(mesh); */
 
   return DMG_SUCCESS;
 }
@@ -102,25 +102,237 @@ int DMG_insertBdryPoints(DMG_pMesh mesh) {
 
 
 int DMG_enforceBndry(DMG_pMesh mesh) {
+  DMG_pPoint ppt;
   DMG_pEdge pa;
-  /* DMG_pTria pt; */
-  int ia, it, nt, tlist[DMG_LIST_SIZE];
+  DMG_pTria pt;
+  DMG_Queue *queue;
+  int i, k, iploc, i1, i2, it, jt, nanoex, nswap, tcount, list[DMG_LIST_SIZE], iadj, tmp, ita[3], jta[3];
+  double *a, *b, *c, *p, *q;
 
-  /* For each edge of the boundary, list the edges that intersect it and proceed by local swapping to recover the boundary edge */
-  for (ia = 1 ; ia <=mesh->na ; ia++) {
-    pa = &mesh->edge[ia];
-    nt = DMG_listCrossTriangles(mesh, pa, tlist);
+  nanoex = nswap = 0;
 
-    for (it = 0 ; it < nt ; it++) {
-      /* pt = &mesh->tria[tlist[it]]; */
+  /* Set the tmp field of each point to the index of one triangle they belong to */
+  for (i = 1 ; i <= mesh->nt ; i++) {
+    pt = &mesh->tria[i];
+    for (k = 0 ; k < 3 ; k++) {
+      mesh->point[pt->v[k]].tmp = i;
     }
   }
+
+  /* Loop over all the edge constraints */
+  for (i = 1 ; i <= mesh->na ; i++) {
+    pa = &mesh->edge[i];
+
+    /* Coordinates of the vertices of the edge */
+    p = mesh->point[pa->v[0]].c;
+    q = mesh->point[pa->v[1]].c;
+
+    ppt = &mesh->point[pa->v[0]];
+    it = ppt->tmp;
+    pt = &mesh->tria[it];
+
+    if (pt->v[0] == pa->v[0])
+      iploc = 0;
+    else if (pt->v[1] == pa->v[0])
+      iploc = 1;
+    else
+      iploc = 2;
+
+    tcount = DMG_findBall(mesh, it, iploc, list);
+
+    /* Run through the triangles of the ball to see if the edge matches an existing edge */
+    for (k = 0 ; k < tcount ; k++) {
+      it = list[k] / 3;
+      iploc = list[k] % 3;
+      pt = &mesh->tria[it];
+      i1 = DMG_tria_vert[iploc + 1];
+      i2 = DMG_tria_vert[iploc + 2];
+
+      if (pt->v[i1] == pa->v[1] || pt->v[i2] == pa->v[1]) {
+        break;
+      }
+    }
+
+    /* If the edge was found, go to the next edge */
+    if (k < tcount) continue;
+
+    printf("edge %d with points %d, %d needs to be enforced\n", i, pa->v[0], pa->v[1]);
+
+    nanoex++;
+
+    /* If the edge was not found, rerun through the triangles of the ball and find 
+       the triangle whose edge iploc is crossed by the constrained edge. */
+    for (k = 0 ; k < tcount ; k++) {
+      it = list[k] / 3;
+      iploc = list[k] % 3;
+      pt = &mesh->tria[it];
+      i1 = DMG_tria_vert[iploc + 1];
+      i2 = DMG_tria_vert[iploc + 2];
+
+      a = mesh->point[pt->v[i1]].c;
+      b = mesh->point[pt->v[i2]].c;
+
+      if (DMG_segSegIntersect(a, b, p, q)) break;
+    }
+
+    assert ( k < tcount );
+
+    /* Put all triangles that intersect the constrained edge in a queue */
+    queue = DMG_createQueue();
+    DMG_enQueue(queue, it);
+    iadj = 3 * it + iploc;
+    do {
+      iadj = mesh->adja[iadj];
+      it = iadj / 3;
+      iploc = iadj % 3;
+      DMG_enQueue(queue, it);
+
+      pt = &mesh->tria[it];
+
+      /* If iploc matches the second contrained edge vertex, we got them all. */
+      if (pt->v[iploc] == pa->v[1]) break;
+
+      /* Check the 2 other edges to find the next triangle */
+      a = mesh->point[pt->v[iploc]].c;
+      b = mesh->point[pt->v[DMG_tria_vert[iploc+1]]].c;
+      if (DMG_segSegIntersect(a, b, p, q)) {
+        iadj = 3 * it + DMG_tria_vert[iploc + 2];
+        continue;
+      }
+      b = mesh->point[pt->v[DMG_tria_vert[iploc+2]]].c;
+      if (DMG_segSegIntersect(a, b, p, q)) {
+        iadj = 3 * it + DMG_tria_vert[iploc + 1];
+        continue;
+      }
+
+    } while (1);
+
+    /* While the queue is not empty, test every edge of each triangle. Try to swap the edges that
+     * intersect the constrained edge. If the swap is illegal, requeue the triangle. */
+    while (!DMG_qIsEmpty(queue)) {
+      it = DMG_deQueue(queue);
+      pt = &mesh->tria[it];
+      tmp = 0;
+      /* This might be faster using the segment-triangle intersection routine */
+      for (k = 0 ; k < 3 ; k++) {
+        a = mesh->point[pt->v[DMG_tria_vert[k+1]]].c;
+        b = mesh->point[pt->v[DMG_tria_vert[k+2]]].c;
+        if (DMG_segSegIntersect(a, b, p, q)) {
+          if (DMG_chkSwap(mesh, it, DMG_tria_vert[k])) {
+            jt = DMG_swap(mesh, it, k, ita, jta);
+            nswap++; 
+          }
+          else if (!tmp) {
+            DMG_enQueue(queue, it);
+            tmp = 1;
+          }
+        }
+      }
+    }
+
+    DMG_freeQueue(queue);
+
+    /** Here is a more elaborate way of doing the same thing but we're not sure it can work. 
+     * It is supposed to be faster, because it is aimed to not check every edge of every triangle
+     * crossed by the constrained edge.
+     */
+    
+    /* /\* Try to swap the front edge of the queue. If it is possible, swap it and enqueue 
+       the next crossed edge. If it is not possible enqueue the next crossed edge AND the 
+       current edge. Continue until all edges have been swapped. *\/ */
+    /* queue = DMG_createQueue(); */
+    /* iadj = 3 * it + iploc; */
+    /* DMG_enQueue(queue, iadj); */
+
+    /* while (!DMG_qIsEmpty(queue)) { */
+    /*   iadj = DMG_deQueue(queue); */
+
+    /*   it = iadj / 3; */
+    /*   iploc = iadj % 3; */
+
+    /*   if (nswap == 1) { */
+    /*     DMG_saveMesh_medit(mesh, "meshes/plop2.mesh"); */
+    /*   } */
+    /*   if (DMG_chkSwap(mesh, it, iploc)) { */
+    /*     jt = DMG_swap(mesh, it, iploc, ita, jta); */
+    /*     nswap++; */
+
+    /*     /\* If vertices 1 and 2 of it (or jt) correspond to the vertices of the edge, we are done *\/ */
+    /*     pt = &mesh->tria[it]; */
+    /*     if ((pt->v[1] == pa->v[0] && pt->v[2] == pa->v[1]) || */
+    /*         (pt->v[1] == pa->v[1] && pt->v[2] == pa->v[0])) */
+    /*       break; */
+
+    /*     /\* Search for the next crossed edge *\/ */
+    /*     if (ita[iploc] / 3 == jt) { */
+    /*       /\* In triangle it *\/ */
+    /*       pt = &mesh->tria[it]; */
+    /*       a = mesh->point[pt->v[0]].c; */
+    /*       b = mesh->point[pt->v[1]].c; */
+    /*       if (DMG_segSegIntersect(a, b, p, q)) { */
+    /*         DMG_enQueue(queue, 3 * it + 2); */
+    /*         continue; */
+    /*       } */
+    /*       b = mesh->point[pt->v[2]].c; */
+    /*       if (DMG_segSegIntersect(a, b, p, q)) { */
+    /*         DMG_enQueue(queue, 3 * it + 1); */
+    /*         continue; */
+    /*       } */
+    /*     } */
+
+    /*     if (ita[iploc] / 3 == it) { */
+    /*       /\* In triangle jt *\/ */
+    /*       pt = &mesh->tria[jt]; */
+    /*       a = mesh->point[pt->v[0]].c; */
+    /*       b = mesh->point[pt->v[1]].c; */
+    /*       if (DMG_segSegIntersect(a, b, p, q)) { */
+    /*         DMG_enQueue(queue, 3 * jt + 2); */
+    /*         continue; */
+    /*       } */
+    /*       b = mesh->point[pt->v[2]].c; */
+    /*       if (DMG_segSegIntersect(a, b, p, q)) { */
+    /*         DMG_enQueue(queue, 3 * jt + 1); */
+    /*         continue; */
+    /*       } */
+    /*     } */
+
+    /*   } */
+
+    /*   /\* If the swap is illegal, enqueue the next crossed edge, and then the current crossed edge. *\/ */
+    /*   tmp = iadj; */
+
+    /*   iadj = mesh->adja[iadj]; */
+    /*   it = iadj / 3; */
+    /*   iploc = iadj % 3; */
+    /*   iadj = 3 * it; */
+
+    /*   pt = &mesh->tria[it]; */
+    /*   a = mesh->point[pt->v[iploc]].c; */
+    /*   b = mesh->point[pt->v[DMG_tria_vert[iploc+1]]].c; */
+    /*   c = mesh->point[pt->v[DMG_tria_vert[iploc+2]]].c; */
+
+    /*   if (DMG_segSegIntersect(a, b, p, q)) */
+    /*     DMG_enQueue(queue, iadj + DMG_tria_vert[iploc+2]); */
+    /*   else if (DMG_segSegIntersect(c, a, p, q)) */
+    /*     DMG_enQueue(queue, iadj + DMG_tria_vert[iploc+1]); */
+    /*   /\* else *\/ */
+    /*     /\* printf("caca\n"); *\/ */
+
+    /*   DMG_enQueue(queue, tmp); */
+    /* } */
+
+    /* DMG_freeQueue(queue); */
+
+  }
+
+  if (nanoex)
+    printf("%d edge(s) enforced with %d swap(s)\n", nanoex, nswap);
 
   return DMG_SUCCESS;
 }
 
 
-int DMG_deleteBoundingBox(DMG_pMesh mesh) {
+int DMG_markSubDomains(DMG_pMesh mesh) {
 
   return DMG_SUCCESS;
 }
