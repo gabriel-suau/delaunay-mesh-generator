@@ -2,8 +2,7 @@
 
 #define DMG_EPSTRIA -1e-18
 
-double DMG_orient(double a[2], double b[2], double c[2])
-{
+double DMG_orient(const double a[2], const double b[2], const double c[2]) {
   double abx, aby, acx, acy;
 
   abx = b[0] - a[0];
@@ -14,8 +13,81 @@ double DMG_orient(double a[2], double b[2], double c[2])
   return abx * acy - aby * acx;
 }
 
-double DMG_inCircle(double a[2], double b[2], double c[2], double d[2])
-{
+int DMG_segIntersect(const double a[2], const double b[2], const double p[2], const double q[2]) {
+  double abx, aby, apx, apy, pqx, pqy;
+  double ab_ap, ab_pq, ap_pq;
+
+  abx = b[0] - a[0];
+  aby = b[1] - a[1];
+  apx = p[0] - a[0];
+  apy = p[1] - a[1];
+  pqx = q[0] - p[0];
+  pqy = q[1] - p[1];
+
+  ab_ap = abx * apy - aby * apx;
+  ab_pq = abx * pqy - aby * pqx;
+  ap_pq = apx * pqy - apy * pqx;
+
+  if ((ab_ap * (ab_ap + ab_pq) < 0) && (ap_pq * (ap_pq - ab_pq)) < 0)
+    return 1;
+  else
+    return 0;
+}
+
+int DMG_triaSegIntersect(const double a[2], const double b[2], const double c[2], const double p[2], const double  q[2]) {
+  double abx, aby, apx, apy, pqx, pqy, bcx, bcy, bpx, bpy, cax, cay, cpx, cpy;
+  double ab_ap, ab_pq, ap_pq, bc_bp, bc_pq, bp_pq, ca_cp, ca_pq, cp_pq;
+  int code;
+
+  code = 0;
+
+  /* Compute vectors coordinates */
+  abx = b[0] - a[0];
+  aby = b[1] - a[1];
+  apx = p[0] - a[0];
+  apy = p[1] - a[1];
+  pqx = q[0] - p[0];
+  pqy = q[1] - p[1];
+
+  bcx = c[0] - b[0];
+  bcy = c[1] - b[1];
+  bpx = p[0] - b[0];
+  bpy = p[1] - b[1];
+
+  cax = a[0] - c[0];
+  cay = a[1] - c[1];
+  cpx = p[0] - c[0];
+  cpy = p[1] - c[1];
+
+  /* Compute cross products */
+  ab_ap = abx * apy - aby * apx;
+  ab_pq = abx * pqy - aby * pqx;
+  ap_pq = apx * pqy - apy * pqx;
+  bc_pq = bcx * pqy - bcy * pqx;
+  bc_bp = bcx * bpy - bcy * bpx;
+  ca_cp = cax * cpy - cay * cpx;
+
+  /* Deduce the three other cross products */
+  bp_pq = ap_pq - ab_pq;
+  ca_pq = -(ap_pq + bc_pq);
+  cp_pq = ca_pq * ap_pq;
+
+  /* Test edge (ab) */
+  if ((ab_ap * (ab_ap + ab_pq) < 0.0) && (ap_pq * (ap_pq - ab_pq) < 0.0))
+    code += 1;
+
+  /* Test edge (bc) */
+  if ((bc_bp * (bc_bp + bc_pq) < 0.0) && (bp_pq * (ap_pq - bc_pq) < 0.0))
+    code += 2;
+
+  /* Test edge (ca) */
+  if ((ca_cp * (ca_cp + ca_pq) < 0.0) && (cp_pq * (ap_pq - ca_pq) < 0.0))
+    code += 4;
+
+  return code;
+}
+
+double DMG_inCircle(const double a[2], const double b[2], const double c[2], const double d[2]) {
   double adx, ady, bdx, bdy, cdx, cdy;
   double abdet, bcdet, cadet;
   double adsq, bdsq, cdsq;
@@ -39,8 +111,7 @@ double DMG_inCircle(double a[2], double b[2], double c[2], double d[2])
 
 /* Compute the barycentric coordinates of point c in triangle pt */
 /* Also return 1 if c is in triangle, 0 if c is not in triangle */
-int DMG_baryCoord(DMG_pMesh mesh, DMG_pTria pt, double c[2], double *det, double bc[3])
-{
+int DMG_baryCoord(DMG_pMesh mesh, DMG_pTria pt, double c[2], double *det, double bc[3]) {
   double *pa, *pb, *pc;
 
   pa = mesh->point[pt->v[0]].c;
@@ -63,8 +134,7 @@ int DMG_baryCoord(DMG_pMesh mesh, DMG_pTria pt, double c[2], double *det, double
 }
 
 
-int DMG_locTria_brute(DMG_pMesh mesh, double c[2])
-{
+int DMG_locTria_brute(DMG_pMesh mesh, double c[2]) {
   DMG_pTria pt;
   double *a, *b;
   int it, k, flag;
@@ -90,7 +160,7 @@ int DMG_locTria_brute(DMG_pMesh mesh, double c[2])
     }
   }
 
-  return 1; // error : point not found
+  return 0; // error : point not found
 }
 
 
@@ -130,48 +200,6 @@ int DMG_locTria(DMG_pMesh mesh, int start, double c[2]) {
   }
 
   return it;
-}
-
-
-int DMG_locTria_bary(DMG_pMesh mesh, int start, double c[2], double bc[3])
-{
-  DMG_pTria pt;
-  double det;
-  int it, j, iter, dir[3], *adja, iadj;
-
-  it = start;
-  iter = 0;
-
-  while (iter < mesh->nt) {
-    pt = &mesh->tria[it];
-
-    /* Compute the barycentric coordinates of point c in triangle it */
-    if (DMG_baryCoord(mesh, pt, c, &det, bc))
-      break;
-
-    dir[0] = (bc[0] < -DMG_EPSILON) ? 1 : 0;
-    dir[1] = (bc[1] < -DMG_EPSILON) ? 1 : 0;
-    dir[2] = (bc[2] < -DMG_EPSILON) ? 1 : 0;
-
-    iadj = 3 * it;
-    adja = &mesh->adja[iadj];
-
-    for (j = 0; j < 3; j++) {
-      if (dir[j]) {
-        it = adja[j] / 3; /* mesh->adja[iadj + j] / 3 */
-        break;
-      }
-    }
-
-    iter++;
-  }
-
-  return it;
-}
-
-
-int DMG_listCrossTriangles(DMG_pMesh mesh, DMG_pEdge pa, int *tlist) {
-  return DMG_SUCCESS;
 }
 
 

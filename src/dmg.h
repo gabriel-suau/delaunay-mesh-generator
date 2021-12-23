@@ -185,7 +185,36 @@ int DMG_saveQual_medit(DMG_pMesh mesh, char *filename);
  *    < 0 if a, b, c are ordered clockwise
  *    = 0 if a, b, c are colinear
  */
-double DMG_orient(double a[2], double b[2], double c[2]);
+double DMG_orient(const double a[2], const double b[2], const double c[2]);
+
+/**
+ * \param[in] a coordinates of the first point of the first segment
+ * \param[in] b coordinates of the second point of the first segment
+ * \param[in] p coordinates of the first point of the second segment
+ * \param[in] q coordinates of the second point of the second segment
+ * \return 1 if the segments (ab) and (pq) intersect, else 0
+ *
+ * 2D segment-segment intersection test.
+ *
+ */
+int DMG_segSegIntersect(const double a[2], const double b[2], const double p[2], const double q[2]);
+
+/**
+ * \param[in] a coordinates of the first triangle point
+ * \param[in] b coordinates of the second triangle point
+ * \param[in] c coordinates of the third triangle point
+ * \param[in] p coordinates of the first segment point
+ * \param[in] q coordinates of the second segment point
+ * \return sum (integer between 0 and 7)
+ *
+ * Implementation of the 2D segment-triangle intersection test.
+ * The result is a sum whose value is given by : 
+ * sum = 0 
+ *     + 1 if edge (ab) and (pq) intersect
+ *     + 2 if edge (bc) and (pq) intersect
+ *     + 4 if edge (ca) and (pq) intersect
+ */
+int DMG_triaSegIntersect(const double a[2], const double b[2], const double c[2], const double p[2], const double q[2]);
 
 /**
  * \param[in] a coordinates of the first point of the triangle
@@ -209,7 +238,7 @@ double DMG_orient(double a[2], double b[2], double c[2]);
  * \remark a, b and c must me in counterclockwise order; if they are in clockwise order,
  * the result is the opposite.
  */
-double DMG_inCircle(double a[2], double b[2], double c[2], double d[2]);
+double DMG_inCircle(const double a[2], const double b[2], const double c[2], const double d[2]);
 
 /**
  * \param[in] mesh pointer toward the mesh structure
