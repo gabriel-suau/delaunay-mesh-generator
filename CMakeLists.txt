@@ -16,5 +16,10 @@ file(GLOB DMG_SOURCE_FILES ${DMG_SOURCE_DIR}/*.c)
 # add compiler options
 add_compile_options(-Wall)
 
+# include the math library
+find_library(M_LIB m)
+set(LIBRARIES ${M_LIB} ${LIBRARIES})
+link_libraries(${LIBRARIES})
+
 # add the executable
 add_executable(dmg ${DMG_SOURCE_FILES})
