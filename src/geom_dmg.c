@@ -13,7 +13,7 @@ double DMG_orient(const double a[2], const double b[2], const double c[2]) {
   return abx * acy - aby * acx;
 }
 
-int DMG_segIntersect(const double a[2], const double b[2], const double p[2], const double q[2]) {
+int DMG_segSegIntersect(const double a[2], const double b[2], const double p[2], const double q[2]) {
   double abx, aby, apx, apy, pqx, pqy;
   double ab_ap, ab_pq, ap_pq;
 
