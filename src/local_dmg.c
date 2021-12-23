@@ -54,6 +54,7 @@ int DMG_createCavity(DMG_pMesh mesh, double d[2], int start, int *ptlist) {
         if (!jt) {
           ptlist[ptcount++] = pt->v[DMG_tria_vert[k+1]];
           ptlist[ptcount++] = pt->v[DMG_tria_vert[k+2]];
+          ptlist[ptcount++] = 0;
         } else {
           ptmp = &mesh->tria[jt];
           if (!ptmp->flag) {
@@ -87,6 +88,7 @@ int DMG_createCavity(DMG_pMesh mesh, double d[2], int start, int *ptlist) {
       if (ptmp->flag == 2) {
         ptlist[ptcount++] = pt->v[DMG_tria_vert[k+2]];
         ptlist[ptcount++] = pt->v[DMG_tria_vert[k+1]];
+        ptlist[ptcount++] = 3 * it + k;
       } 
     }    
   }
@@ -105,26 +107,43 @@ int DMG_createCavity(DMG_pMesh mesh, double d[2], int start, int *ptlist) {
 
 
 int DMG_createBall(DMG_pMesh mesh, int ip, int ptcount, const int *ptlist) {
-  DMG_pTria pt;
-  int k, ia, ib, it;
+  DMG_pTria pt, pt1;
+  int i, k, ia, ib, it, jt, count, iadj, tlist[DMG_LIST_SIZE];
 
-  it = 0;
+  count = it = 0;
 
   assert(ptcount && ptlist != NULL);
 
-  /* Create the triangles */
-  for (k = 0 ; k < ptcount ; k+=2) {
+  /* Create the triangles and set the adjacency relations between the triangles of the ball 
+     and the triangles adjacent to the cavity */
+  for (k = 0 ; k < ptcount ; k += 3) {
     ia = ptlist[k];
     ib = ptlist[k+1];
+    iadj = ptlist[k+2];
     it = DMG_newTria(mesh);
+    tlist[count++] = it;
     pt = &mesh->tria[it];
     pt->v[0] = ip;
     pt->v[1] = ia;
     pt->v[2] = ib;
+    mesh->adja[3 * it] = iadj;
+    mesh->adja[iadj] = 3 * it;
   }
 
-  /* Create the adjacency relations */
-  DMG_setAdja(mesh);
+  /* Create the adjacency relations between the triangles of the ball */
+  for (i = 0 ; i < count ; i++) {
+    it = tlist[i];
+    pt = &mesh->tria[it];
+    for (k = 0 ; k < count ; k++) {
+      if (k == i) continue;
+      jt = tlist[k];
+      pt1 = &mesh->tria[jt];
+      if (pt->v[1] == pt1->v[2]) {
+        mesh->adja[3 * it + 2] = 3 * jt + 1;
+        mesh->adja[3 * jt + 1] = 3 * it + 2;
+      }
+    }
+  }
 
   return it;
 }
