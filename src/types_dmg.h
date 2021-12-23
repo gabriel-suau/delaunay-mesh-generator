@@ -7,6 +7,7 @@
 #include <float.h>
 #include <assert.h>
 #include <stdint.h>
+#include <math.h>
 
 #define DMG_FAILURE 1
 
@@ -63,6 +64,13 @@ typedef struct {
   int *adja;
 } DMG_Mesh;
 typedef DMG_Mesh* DMG_pMesh;
+
+typedef struct {
+  int np;
+  double hmin, hmax;
+  double *m;
+} DMG_SMap;
+typedef DMG_SMap* DMG_pSMap;
 
 /* One node of the queue (implemented as a singly linked list) */
 typedef struct DMG_Qnode_s {

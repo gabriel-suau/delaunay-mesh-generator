@@ -1,7 +1,7 @@
 #include "dmg.h"
 
 
-int DMG_delaunay(DMG_pMesh mesh) {
+int DMG_delaunay(DMG_pMesh mesh, DMG_pSMap smap) {
 
   DMG_initDelaunay(mesh);
 
@@ -12,6 +12,8 @@ int DMG_delaunay(DMG_pMesh mesh) {
   DMG_markSubDomains(mesh);
 
   DMG_packMesh(mesh);
+
+  DMG_refineDelaunay(mesh, smap);
 
   return DMG_SUCCESS;
 }
@@ -416,6 +418,13 @@ int DMG_markSubDomains(DMG_pMesh mesh) {
   DMG_delPoint(mesh, mesh->np);
   DMG_delPoint(mesh, mesh->np);
   DMG_delPoint(mesh, mesh->np);
+
+  return DMG_SUCCESS;
+}
+
+
+int DMG_refineDelaunay(DMG_pMesh mesh, DMG_pSMap smap) {
+  DMG_computeSizeMap(mesh, smap);
 
   return DMG_SUCCESS;
 }

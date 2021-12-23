@@ -4,10 +4,12 @@
 int main(int argc, char **argv)
 {
   DMG_pMesh mesh;
+  DMG_pSMap smap;
   char *filein, *fileout, *qualout;
   int nclass = 5;
 
   mesh = NULL;
+  smap = NULL;
   filein = fileout = qualout = NULL;
 
   /** Check arguments */
@@ -35,18 +37,16 @@ int main(int argc, char **argv)
   strcat(qualout, ".sol");
 
   /** Init the mesh struct */
-  if (DMG_Init_mesh(&mesh) == DMG_FAILURE) {
-    exit(EXIT_SUCCESS);
-  }
+  if (DMG_Init_mesh(&mesh, &smap) == DMG_FAILURE)
+    goto free_and_return;
 
   /** Read the mesh */
-  if (DMG_loadMesh_medit(mesh, filein) == DMG_FAILURE) {
-    DMG_Free_mesh(mesh);
-    exit(EXIT_FAILURE);
-  }
+  if (DMG_loadMesh_medit(mesh, smap, filein) == DMG_FAILURE)
+    goto free_and_return;
 
   /** Delaunay meshing */
-  DMG_delaunay(mesh);
+  if (DMG_delaunay(mesh, smap) == DMG_FAILURE)
+    goto free_and_return;
 
   /* /\** Check the validity of the mesh (delaunay criterion) *\/ */
   /* if (!DMG_chkDelaunay(mesh)) { */
@@ -60,22 +60,23 @@ int main(int argc, char **argv)
   DMG_displayQualHisto(mesh, nclass);
 
   /** Save the mesh */
-  if (DMG_saveMesh_medit(mesh, fileout) == DMG_FAILURE) {
-    DMG_Free_mesh(mesh);
-    exit(EXIT_FAILURE);
-  }
+  if (DMG_saveMesh_medit(mesh, fileout) == DMG_FAILURE)
+    goto free_and_return;
 
-  /** Save the quality */
-  if (DMG_saveQual_medit(mesh, qualout) == DMG_FAILURE) {
-    DMG_Free_mesh(mesh);
-    exit(EXIT_FAILURE);
-  }
+  /** Save tne size map */
+  if (DMG_saveSizeMap_medit(mesh, smap, qualout) == DMG_FAILURE)
+    goto free_and_return;
+
+  /* /\** Save the quality *\/ */
+  /* if (DMG_saveQual_medit(mesh, qualout) == DMG_FAILURE) */
+  /*   goto free_and_return; */
 
   /** Free all allocated memory */
+ free_and_return:
   free(filein); filein = NULL;
   free(fileout); fileout = NULL;
   free(qualout); qualout = NULL;
-  DMG_Free_mesh(mesh);
+  DMG_Free_mesh(mesh, smap);
 
   return EXIT_SUCCESS;
 }

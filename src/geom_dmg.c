@@ -1,4 +1,5 @@
 #include "dmg.h"
+#include <math.h>
 
 #define DMG_EPSTRIA -1e-18
 
@@ -202,6 +203,95 @@ int DMG_locTria(DMG_pMesh mesh, int start, double c[2]) {
   return it;
 }
 
+
+double DMG_length(double a[2], double b[2]) {
+  double abx, aby;
+
+  abx = b[0] - a[0];
+  aby = b[1] - a[1];
+
+  return sqrt(abx * abx + aby * aby);
+}
+
+
+int DMG_computeSizeMap(DMG_pMesh mesh, DMG_pSMap smap) {
+  DMG_pPoint ppt1, ppt2;
+  DMG_pEdge pa;
+  int ia, ip;
+  double *a, *b, h;
+
+  assert (smap != NULL && smap->m != NULL && smap->np == mesh->np);
+
+  for (ip = 1 ; ip <= mesh->np ; ip++) {
+    mesh->point[ip].tmp = 0;
+  }
+
+  for (ia = 1 ; ia <= mesh->na ; ia++) {
+    pa = &mesh->edge[ia];
+    ppt1 = &mesh->point[pa->v[0]];
+    ppt2 = &mesh->point[pa->v[1]];
+    a = ppt1->c;
+    b = ppt2->c;
+    h = DMG_length(a, b);
+    smap->m[pa->v[0]] += h;
+    smap->m[pa->v[1]] += h;
+    if (h < smap->hmin) smap->hmin = h;
+    if (h > smap->hmax) smap->hmax = h;
+    ppt1->tmp++;
+    ppt2->tmp++;
+  }
+
+  for (ip = 1 ; ip <= mesh->np ; ip++) {
+    ppt1 = &mesh->point[ip];
+    smap->m[ip] /= ppt1->tmp;
+    ppt1->tmp = 0;
+  }
+
+  return DMG_SUCCESS;
+}
+
+/* int DMG_computeSizeMap(DMG_pMesh mesh, DMG_pSMap smap) { */
+/*   DMG_pPoint ppt; */
+/*   DMG_pTria pt; */
+/*   int it, ip, i1, k, iploc, tcount, list[DMG_LIST_SIZE]; */
+/*   double *a, *b, h; */
+
+/*   assert (smap != NULL && smap->m != NULL && smap->np == mesh->np); */
+
+/*   for (it = 1 ; it <= mesh->nt ; it++) { */
+/*     pt = &mesh->tria[it]; */
+/*     if (!DMG_TOK(pt)) continue; */
+/*     for (k = 0 ; k < 3 ; k++) { */
+/*       mesh->point[pt->v[k]].tmp = it; */
+/*     } */
+/*   } */
+
+/*   for (ip = 1 ; ip <= mesh->np ; ip++) { */
+/*     it = mesh->point[ip].tmp; */
+/*     pt = &mesh->tria[it]; */
+
+/*     if (pt->v[0] == ip) iploc = 0; */
+/*     else if (pt->v[1] == ip) iploc = 1; */
+/*     else iploc = 2; */
+
+/*     tcount = DMG_findBall(mesh, it, iploc, list); */
+
+/*     h = 0.0; */
+
+/*     for (k = 0 ; k < tcount ; k++) { */
+/*       it = list[k] / 3; */
+/*       iploc = list[k] % 3; */
+/*       pt = &mesh->tria[it]; */
+/*       a = mesh->point[pt->v[iploc]].c; */
+/*       b = mesh->point[pt->v[DMG_tria_vert[iploc+1]]].c; */
+/*       h += DMG_length(a, b); */
+/*     } */
+
+/*     smap->m[ip] = h / tcount; */
+/*   } */
+
+/*   return DMG_SUCCESS; */
+/* } */
 
 int DMG_chkDelaunay(DMG_pMesh mesh) {
   DMG_pTria pt;
