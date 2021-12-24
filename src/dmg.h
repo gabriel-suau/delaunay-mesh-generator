@@ -208,6 +208,8 @@ int DMG_saveSizeMap_medit(DMG_pMesh mesh, char *filename);
  */
 double DMG_orient(const double a[2], const double b[2], const double c[2]);
 
+double DMG_length(const double a[2], const double b[2]);
+
 /**
  * \param[in] a coordinates of the first point of the first segment
  * \param[in] b coordinates of the second point of the first segment
