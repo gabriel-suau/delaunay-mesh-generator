@@ -102,6 +102,7 @@ int DMG_newPoint(DMG_pMesh mesh, double c[2]) {
   memcpy(ppt->c, c, 2 * sizeof(double));
   mesh->npu = ppt->tmp;
   ppt->tmp = 0;
+  ppt->tag = DMG_VALIDPOINT;
 
   return ip;
 }
@@ -111,7 +112,9 @@ void DMG_delPoint(DMG_pMesh mesh, int ip) {
   DMG_pPoint ppt;
 
   ppt = &mesh->point[ip];
+
   memset(ppt, 0, sizeof(DMG_Point));
+  ppt->tag = DMG_NULPOINT;
   ppt->tmp = mesh->npu;
 
   mesh->npu = ip;

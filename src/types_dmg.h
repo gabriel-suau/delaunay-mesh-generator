@@ -15,6 +15,9 @@
 
 #define DMG_UNSET -1
 
+#define DMG_NULPOINT 10
+#define DMG_VALIDPOINT 11
+
 enum DMG_Flags {
   DMG_FLAG_NOFLAG = 0,
   DMG_FLAG_WALK,
@@ -27,6 +30,7 @@ typedef struct {
   double h; /* Prescribed edge size at the vertex */
   int ref;
   int flag; /* Flag to tell il the point has been inserted in the triangulation */
+  int tag;
   int tmp;
 } DMG_Point;
 typedef DMG_Point* DMG_pPoint;
