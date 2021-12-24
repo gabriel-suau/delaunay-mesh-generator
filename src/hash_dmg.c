@@ -1,8 +1,5 @@
 #include "dmg.h"
 
-#define KA 7
-#define KB 11
-
 int DMG_hashHedge(DMG_pMesh mesh, DMG_Hedge *htab) {
   int hnxt, i, j, key, iadj, a, b, vmin, vmax, hsize, flag;
   DMG_pTria pt;

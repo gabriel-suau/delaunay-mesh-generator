@@ -14,6 +14,10 @@
 
 #define DMG_LIST_SIZE 64
 
+/* Used for the hash function */
+#define KA 7
+#define KB 11
+
 #define MAX2(a, b) (((a) >= (b)) ? (a) : (b))
 #define MIN2(a, b) (((a) <= (b)) ? (a) : (b))
 #define ABS(a) (((a) >= 0.) ? (a) : (-a))
