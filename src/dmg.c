@@ -61,13 +61,13 @@ int main(int argc, char **argv)
   if (DMG_saveMesh_medit(mesh, fileout) == DMG_FAILURE)
     goto free_and_return;
 
-  /* /\** Save tne size map *\/ */
-  /* if (DMG_saveSizeMap_medit(mesh, qualout) == DMG_FAILURE) */
-  /*   goto free_and_return; */
-
-  /** Save the quality */
-  if (DMG_saveQual_medit(mesh, qualout) == DMG_FAILURE)
+  /** Save the size map */
+  if (DMG_saveSizeMap_medit(mesh, qualout) == DMG_FAILURE)
     goto free_and_return;
+
+  /* /\** Save the quality *\/ */
+  /* if (DMG_saveQual_medit(mesh, qualout) == DMG_FAILURE) */
+  /*   goto free_and_return; */
 
   /** Free all allocated memory */
  free_and_return:
