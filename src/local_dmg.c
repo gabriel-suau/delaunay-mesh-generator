@@ -182,7 +182,7 @@ int DMG_chkSwap(DMG_pMesh mesh, int it, int k) {
 }
 
 
-int DMG_swap(DMG_pMesh mesh, int it, int k, int ita[3], int jta[3]) {
+int DMG_swap(DMG_pMesh mesh, int it, int k) {
   DMG_pTria pt;
   int *adja, jt, l, itadj, jtadj, adjait[3], adjajt[3], adjr, a, p, q, d;
 
@@ -241,13 +241,13 @@ int DMG_swap(DMG_pMesh mesh, int it, int k, int ita[3], int jta[3]) {
   adjr = adja[2];
   mesh->adja[adjr] = jtadj + 2;
 
-  ita[DMG_tria_vert[k]] = 0;
-  ita[DMG_tria_vert[k+1]] = itadj + 2;
-  ita[DMG_tria_vert[k+2]] = jtadj + 1;
+  /* ita[DMG_tria_vert[k]] = 0; */
+  /* ita[DMG_tria_vert[k+1]] = itadj + 2; */
+  /* ita[DMG_tria_vert[k+2]] = jtadj + 1; */
 
-  jta[DMG_tria_vert[l]] = 0;
-  jta[DMG_tria_vert[l+1]] = jtadj + 2;
-  jta[DMG_tria_vert[l+2]] = itadj + 1;
+  /* jta[DMG_tria_vert[l]] = 0; */
+  /* jta[DMG_tria_vert[l+1]] = jtadj + 2; */
+  /* jta[DMG_tria_vert[l+2]] = itadj + 1; */
 
   return jt;
 

@@ -368,8 +368,6 @@ int DMG_chkSwap(DMG_pMesh mesh, int it, int k);
  * \param[in] mesh pointer toward the mesh structure
  * \param[in] it index of the triangle
  * \param[in] k local index of the edge to swap
- * \param[out] ita map the old adjacencies of triangle it to the new ones
- * \param[out] jta map the old adjacencies of triangle jt to the new ones
  * \return index jt of the triangle adjacent to it by the swapped edge
  *
  * Perform the swap of local edge k of triangle it. Example :
@@ -377,7 +375,7 @@ int DMG_chkSwap(DMG_pMesh mesh, int it, int k);
  * they become it = (q, a, b) and jt = (p, b, a). Adjacency relationships are updated so that
  * after the swap, triangles it and jt are adjacent by their edge number 0.
  */
-int DMG_swap(DMG_pMesh mesh, int it, int k, int ita[3], int jta[3]);
+int DMG_swap(DMG_pMesh mesh, int it, int k);
 
 /* Queue manipulations */
 DMG_Queue* DMG_createQueue();

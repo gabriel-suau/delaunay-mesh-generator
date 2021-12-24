@@ -110,8 +110,8 @@ int DMG_enforceBndry(DMG_pMesh mesh) {
   DMG_pEdge pa;
   DMG_pTria pt;
   DMG_Queue *queue;
-  int i, k, iploc, i1, i2, it, jt, nanoex, nswap, tcount, list[DMG_LIST_SIZE], iadj, tmp, ita[3], jta[3];
-  double *a, *b, *c, *p, *q;
+  int i, k, iploc, i1, i2, it, nanoex, nswap, tcount, list[DMG_LIST_SIZE], iadj, tmp;
+  double *a, *b, *p, *q;
 
   nanoex = nswap = 0;
 
@@ -224,7 +224,7 @@ int DMG_enforceBndry(DMG_pMesh mesh) {
         b = mesh->point[pt->v[DMG_tria_vert[k+2]]].c;
         if (DMG_segSegIntersect(a, b, p, q)) {
           if (DMG_chkSwap(mesh, it, DMG_tria_vert[k])) {
-            jt = DMG_swap(mesh, it, k, ita, jta);
+            DMG_swap(mesh, it, k);
             nswap++; 
           }
           else if (!tmp) {
