@@ -108,9 +108,9 @@ int DMG_loadMesh_medit(DMG_pMesh mesh, char *filename) {
   fclose(file);
 
   /* Print the nmber of entities */
-  fprintf(stdout, "%d/%d (%d) vertices \n", mesh->np, mesh->npmax, mesh->npu);
-  fprintf(stdout, "%d/%d (%d) edges \n", mesh->na, mesh->namax, mesh->nau);
-  fprintf(stdout, "%d/%d (%d) triangles \n", mesh->nt, mesh->ntmax, mesh->ntu);
+  fprintf(stdout, "%d/%d (first unused: %d) vertices \n", mesh->np, mesh->npmax, mesh->npu);
+  fprintf(stdout, "%d/%d (first unused: %d) edges \n", mesh->na, mesh->namax, mesh->nau);
+  fprintf(stdout, "%d/%d (first unused: %d) triangles \n", mesh->nt, mesh->ntmax, mesh->ntu);
 
   return DMG_SUCCESS;  
 }
@@ -122,7 +122,7 @@ int DMG_saveMesh_medit(DMG_pMesh mesh, char *filename) {
   DMG_pTria pt;
   FILE *file = NULL;
   char chain[127];
-  int i;
+  int i, np, nt;
 
   if (mesh == NULL) {
     fprintf(stderr, "Error: %s: mesh struct not allocated\n", __func__);
@@ -139,6 +139,8 @@ int DMG_saveMesh_medit(DMG_pMesh mesh, char *filename) {
     return DMG_FAILURE;
   }
 
+  np = nt = 0;
+
   /** Header */
   strcpy(chain, "MeshVersionFormatted 2\n");
   fprintf(file, "%s", chain);
@@ -146,11 +148,19 @@ int DMG_saveMesh_medit(DMG_pMesh mesh, char *filename) {
   fprintf(file, "%s", chain);
 
   /** Vertices */
-  strcpy(chain, "\nVertices\n");
-  fprintf(file, "%s", chain);
-  fprintf(file, "%d\n", mesh->np);
+  /* Count */
   for (i = 1 ; i <= mesh->np ; i++) {
     ppt = &mesh->point[i];
+    if (DMG_VOK(ppt)) np++;
+  }
+
+  /* Write */
+  strcpy(chain, "\nVertices\n");
+  fprintf(file, "%s", chain);
+  fprintf(file, "%d\n", np);
+  for (i = 1 ; i <= mesh->np ; i++) {
+    ppt = &mesh->point[i];
+    if (!DMG_VOK(ppt)) continue;
     fprintf(file, "%lf %lf %d\n", ppt->c[0], ppt->c[1], ppt->ref);
   }
 
@@ -164,9 +174,16 @@ int DMG_saveMesh_medit(DMG_pMesh mesh, char *filename) {
   }
 
   /** DMG_Trias */
+  /* Count */
+  for (i = 1 ; i <= mesh->nt ; i++) {
+    pt = &mesh->tria[i];
+    if (DMG_TOK(pt)) nt++;
+  }
+
+  /* Write */
   strcpy(chain, "\nTriangles\n");
   fprintf(file, "%s", chain);
-  fprintf(file, "%d\n", mesh->nt);
+  fprintf(file, "%d\n", nt);
   for (i = 1 ; i <= mesh->nt ; i++) {
     pt = &mesh->tria[i];
     if (!DMG_TOK(pt)) continue;
@@ -189,22 +206,24 @@ int DMG_saveMeshAs3D_medit(DMG_pMesh mesh, char *filename) {
   DMG_pTria pt;
   FILE *file = NULL;
   char chain[127];
-  int i;
+  int i, np, nt;
 
   if (mesh == NULL) {
-    fprintf(stderr, "Error: %s:%d: mesh struct not allocated\n", __func__, __LINE__);
+    fprintf(stderr, "Error: %s: mesh struct not allocated\n", __func__);
     return DMG_FAILURE;
   }
   if (!mesh->np || !mesh->nt) {
-    fprintf(stderr, "Error: %s:%d: can't save an empty mesh\n", __func__, __LINE__);
+    fprintf(stderr, "Error: %s: can't save an empty mesh\n", __func__);
     return DMG_FAILURE;
   }
 
   file = fopen(filename, "w");
   if (file == NULL) {
-    fprintf(stderr, "Error: %s:%d: can't open %s \n", __func__, __LINE__, filename);
+    fprintf(stderr, "Error: %s: can't open %s \n", __func__, filename);
     return DMG_FAILURE;
   }
+
+  np = nt = 0;
 
   /** Header */
   strcpy(chain, "MeshVersionFormatted 2\n");
@@ -213,11 +232,19 @@ int DMG_saveMeshAs3D_medit(DMG_pMesh mesh, char *filename) {
   fprintf(file, "%s", chain);
 
   /** Vertices */
-  strcpy(chain, "\nVertices\n");
-  fprintf(file, "%s", chain);
-  fprintf(file, "%d\n", mesh->np);
+  /* Count */
   for (i = 1 ; i <= mesh->np ; i++) {
     ppt = &mesh->point[i];
+    if (DMG_VOK(ppt)) np++;
+  }
+
+  /* Write */
+  strcpy(chain, "\nVertices\n");
+  fprintf(file, "%s", chain);
+  fprintf(file, "%d\n", np);
+  for (i = 1 ; i <= mesh->np ; i++) {
+    ppt = &mesh->point[i];
+    if (!DMG_VOK(ppt)) continue;
     fprintf(file, "%lf %lf 0 %d\n", ppt->c[0], ppt->c[1], ppt->ref);
   }
 
@@ -231,9 +258,16 @@ int DMG_saveMeshAs3D_medit(DMG_pMesh mesh, char *filename) {
   }
 
   /** DMG_Trias */
+  /* Count */
+  for (i = 1 ; i <= mesh->nt ; i++) {
+    pt = &mesh->tria[i];
+    if (DMG_TOK(pt)) nt++;
+  }
+
+  /* Write */
   strcpy(chain, "\nTriangles\n");
   fprintf(file, "%s", chain);
-  fprintf(file, "%d\n", mesh->nt);
+  fprintf(file, "%d\n", nt);
   for (i = 1 ; i <= mesh->nt ; i++) {
     pt = &mesh->tria[i];
     if (!DMG_TOK(pt)) continue;
@@ -243,7 +277,7 @@ int DMG_saveMeshAs3D_medit(DMG_pMesh mesh, char *filename) {
   /** End string*/
   strcpy(chain, "\nEnd\n");
   fprintf(file, "%s", chain);
-  
+
   fclose(file);
 
   return DMG_SUCCESS;
