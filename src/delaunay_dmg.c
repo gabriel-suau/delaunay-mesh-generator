@@ -282,7 +282,7 @@ int DMG_markSubDomains(DMG_pMesh mesh) {
 
       for (k = 0 ; k < 3 ; k++) {
         it = adja[k] / 3;
-        if (mesh->tria[it].ref != -1) continue;
+        if (!it || mesh->tria[it].ref != -1) continue;
         a = pt->v[DMG_tria_vert[k+1]];
         b = pt->v[DMG_tria_vert[k+2]];
         for (ia = 1 ; ia <= mesh->na ; ia++) {
@@ -313,13 +313,34 @@ int DMG_markSubDomains(DMG_pMesh mesh) {
 
   DMG_freeQueue(q);
 
-  /* Delete all triangles whose flag is an even number */
-  for (it = 1 ; it <= mesh->nt ; it++) {
-    pt = &mesh->tria[it];
-    if (!DMG_TOK(pt)) continue;
-    if (pt->ref % 2 == 0) {
-      DMG_delTria(mesh, it);
+  /* Search for one triangle adjacent to a BB triangle by a constrained edge. */
+  /* Delete all triangles that do not have its color */
+  it = ppt->tmp;
+  adja = &mesh->adja[3 * it];
+  pt = &mesh->tria[it];
+  for (k = 0 ; k < 3 ; k++) {
+    it = adja[k] / 3;
+    if (!it) continue;
+    a = pt->v[DMG_tria_vert[k+1]];
+    b = pt->v[DMG_tria_vert[k+2]];
+    for (ia = 1 ; ia <= mesh->na ; ia++) {
+      pa = &mesh->edge[ia];
+      if ((a == pa->v[0] && b == pa->v[1]) ||
+          (a == pa->v[1] && b == pa->v[0])) {
+        goto found;
+        break;
+      }
     }
+  }
+
+ found:
+  color = mesh->tria[it].ref;
+
+  for (k = 1 ; k <= mesh->nt ; k++) {
+    pt = &mesh->tria[k];
+    if (!DMG_TOK(pt)) continue;
+    if (pt->ref != color)
+      DMG_delTria(mesh, k);
   }
 
   /* Delete the bounding box vertices */
