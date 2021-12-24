@@ -288,7 +288,7 @@ int DMG_saveQual_medit(DMG_pMesh mesh, char *filename) {
   DMG_pTria pt;
   FILE *file = NULL;
   char chain[127];
-  int i;
+  int i, nt;
 
   if (mesh == NULL) {
     fprintf(stderr, "Error: %s: mesh struct not allocated\n", __func__);
@@ -305,6 +305,8 @@ int DMG_saveQual_medit(DMG_pMesh mesh, char *filename) {
     return DMG_FAILURE;
   }
 
+  nt = 0;
+
   /** Header */
   strcpy(chain, "MeshVersionFormatted 2\n");
   fprintf(file, "%s", chain);
@@ -312,14 +314,20 @@ int DMG_saveQual_medit(DMG_pMesh mesh, char *filename) {
   fprintf(file, "%s", chain);
 
   /** Quality of triangles */
+  /* Count */
+  for (i = 1 ; i <= mesh->nt ; i++) {
+    pt = &mesh->tria[i];
+    if (DMG_TOK(pt)) nt++;
+  }
+
   strcpy(chain, "\nSolAtTriangles\n");
   fprintf(file, "%s", chain);
-  fprintf(file, "%d\n", mesh->nt);
+  fprintf(file, "%d\n", nt);
   fprintf(file, "1 1\n");
   for (i = 1 ; i <= mesh->nt ; i++) {
     pt = &mesh->tria[i];
     if (!DMG_TOK(pt)) continue;
-    fprintf(file, "%lf\n", pt->qual);
+    fprintf(file, "%d\n", pt->ref);
   }
 
   /** End string*/
@@ -336,7 +344,7 @@ int DMG_saveSizeMap_medit(DMG_pMesh mesh, char *filename) {
   DMG_pPoint ppt;
   FILE *file = NULL;
   char chain[127];
-  int i;
+  int i, np;
 
   if (mesh == NULL) {
     fprintf(stderr, "Error: %s: mesh struct not allocated\n", __func__);
@@ -353,6 +361,8 @@ int DMG_saveSizeMap_medit(DMG_pMesh mesh, char *filename) {
     return DMG_FAILURE;
   }
 
+  np = 0;
+
   /** Header */
   strcpy(chain, "MeshVersionFormatted 2\n");
   fprintf(file, "%s", chain);
@@ -360,12 +370,19 @@ int DMG_saveSizeMap_medit(DMG_pMesh mesh, char *filename) {
   fprintf(file, "%s", chain);
 
   /** Size map */
+  /* Count */
+  for (i = 1 ; i <= mesh->np ; i++) {
+    ppt = &mesh->point[i];
+    if (DMG_VOK(ppt)) np++;
+  }
+
   strcpy(chain, "\nSolAtVertices\n");
   fprintf(file, "%s", chain);
-  fprintf(file, "%d\n", mesh->np);
+  fprintf(file, "%d\n", np);
   fprintf(file, "1 1\n");
   for (i = 1 ; i <= mesh->np ; i++) {
     ppt = &mesh->point[i];
+    if (!DMG_VOK(ppt)) continue;
     fprintf(file, "%lf\n", ppt->h);
   }
 
