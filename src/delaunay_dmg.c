@@ -285,6 +285,7 @@ int DMG_markSubDomains(DMG_pMesh mesh) {
         if (!it || mesh->tria[it].ref != -1) continue;
         a = pt->v[DMG_tria_vert[k+1]];
         b = pt->v[DMG_tria_vert[k+2]];
+        /* TODO : Try to remove this loop using a hash table or something */
         for (ia = 1 ; ia <= mesh->na ; ia++) {
           pa = &mesh->edge[ia];
           if ((a == pa->v[0] && b == pa->v[1]) ||
