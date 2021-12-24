@@ -1,5 +1,5 @@
-#include "dmg.h"
 #include <math.h>
+#include "dmg.h"
 
 #define DMG_EPSTRIA -1e-18
 
@@ -189,6 +189,9 @@ int DMG_locTria(DMG_pMesh mesh, int start, double c[2]) {
 
       if (DMG_orient(a, b, c) < 0.0) {
         it = adja[k] / 3; /* mesh->adja[3 * it + k] */
+        if (it == 0) {
+          it = DMG_locTria_brute(mesh, c);
+        }
         flag = 1;
         break;
       }
