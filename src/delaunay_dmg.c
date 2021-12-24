@@ -1,7 +1,7 @@
 #include "dmg.h"
 
 
-int DMG_delaunay(DMG_pMesh mesh, DMG_pSMap smap) {
+int DMG_delaunay(DMG_pMesh mesh) {
 
   DMG_initDelaunay(mesh);
 
