@@ -308,8 +308,7 @@ int DMG_markSubDomains(DMG_pMesh mesh) {
         break;
       }
     }
-
-    color += 1;
+    color++;
   }
 
   DMG_freeQueue(q);
@@ -317,25 +316,30 @@ int DMG_markSubDomains(DMG_pMesh mesh) {
   /* Search for one triangle adjacent to a BB triangle by a constrained edge. */
   /* Delete all triangles that do not have its color */
   it = ppt->tmp;
-  adja = &mesh->adja[3 * it];
-  pt = &mesh->tria[it];
-  for (k = 0 ; k < 3 ; k++) {
-    it = adja[k] / 3;
-    if (!it) continue;
-    a = pt->v[DMG_tria_vert[k+1]];
-    b = pt->v[DMG_tria_vert[k+2]];
-    for (ia = 1 ; ia <= mesh->na ; ia++) {
-      pa = &mesh->edge[ia];
-      if ((a == pa->v[0] && b == pa->v[1]) ||
-          (a == pa->v[1] && b == pa->v[0])) {
-        goto found;
-        break;
+  color = mesh->tria[it].ref;
+  for (it = 1 ; it <= mesh->nt ; it++) {
+    pt = &mesh->tria[it];
+    if (pt->ref != color) continue;
+    adja = &mesh->adja[3 * it];
+    for (k = 0 ; k < 3 ; k++) {
+      it = adja[k] / 3;
+      if (!it) continue;
+      a = pt->v[DMG_tria_vert[k+1]];
+      b = pt->v[DMG_tria_vert[k+2]];
+      for (ia = 1 ; ia <= mesh->na ; ia++) {
+        pa = &mesh->edge[ia];
+        if ((a == pa->v[0] && b == pa->v[1]) ||
+            (a == pa->v[1] && b == pa->v[0])) {
+          goto found;
+        }
       }
     }
+
   }
 
  found:
   color = mesh->tria[it].ref;
+  printf("%d\n", color);
 
   for (k = 1 ; k <= mesh->nt ; k++) {
     pt = &mesh->tria[k];
