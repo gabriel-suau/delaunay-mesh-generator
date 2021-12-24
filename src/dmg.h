@@ -26,24 +26,22 @@ static const int DMG_tria_vert[5] = {0, 1, 2, 0, 1};
 /* Creation and deletion of the main structures */
 /**
  * \param mesh pointer toward a pointer toward the mesh structure
- * \param smap pointer toward a pointer toward the smap structure
  * \return DMG_SUCCESS if success, DMG_FAILURE if fail
  *
- * Allocate the mesh and smap structures and initialize the main fields.
+ * Allocate the mesh structure and initialize the main fields.
  *
  * \remark mesh has to be a pointer toward a pointer so that the allocated memory
  * is not lost when exiting the function.
  */
-int DMG_Init_mesh(DMG_pMesh *mesh, DMG_pSMap *smap);
+int DMG_Init_mesh(DMG_pMesh *mesh);
 
 /**
  * \param mesh pointer toward the mesh structure
- * \param mesh pointer toward the smap structure
  * \return DMG_SUCCESS (cannot fail)
  *
- * Free the mesh and smap structures and their arrays.
+ * Free the mesh structure and their arrays.
  */
-int DMG_Free_mesh(DMG_pMesh mesh, DMG_pSMap smap);
+int DMG_Free_mesh(DMG_pMesh mesh);
 
 /**
  * \param mesh pointer toward the mesh structure
@@ -52,7 +50,7 @@ int DMG_Free_mesh(DMG_pMesh mesh, DMG_pSMap smap);
  * Allocate the mesh entites arrays using the current npmax, namax and ntmax values.
  * Initialize the unused chain to keep track of the empty available points and tria.
  */
-int DMG_allocMesh(DMG_pMesh mesh, DMG_pSMap smap);
+int DMG_allocMesh(DMG_pMesh mesh);
 
 /**
  * \param mesh pointer toward the mesh structure
@@ -104,7 +102,7 @@ int DMG_packMesh(DMG_pMesh mesh);
  * therefore it has to contain no triangle. The constrained edges are contained in the edge field
  * of the mesh structure.
  */
-int DMG_delaunay(DMG_pMesh mesh, DMG_pSMap smap);
+int DMG_delaunay(DMG_pMesh mesh);
 
 /**
  * \param mesh pointer toward the mesh structure
@@ -142,7 +140,7 @@ int DMG_markSubDomains(DMG_pMesh mesh);
  *
  * Apply the Ruppert's delaunay refinement algorithm to the mesh.
  */
-int DMG_refineDelaunay(DMG_pMesh mesh, DMG_pSMap smap);
+int DMG_refineDelaunay(DMG_pMesh mesh);
 
 /* I/O */
 /**
@@ -151,7 +149,7 @@ int DMG_refineDelaunay(DMG_pMesh mesh, DMG_pSMap smap);
  *
  * Load a mesh from a medit ASCII (.mesh) formatted file.
  */
-int DMG_loadMesh_medit(DMG_pMesh mesh, DMG_pSMap smap, char *filename);
+int DMG_loadMesh_medit(DMG_pMesh mesh, char *filename);
 
 /**
  * \param mesh pointer toward the mesh structure
@@ -180,12 +178,11 @@ int DMG_saveQual_medit(DMG_pMesh mesh, char *filename);
 
 /**
  * \param mesh pointer toward the mesh structure
- * \param smap pointer toward the smap structure
  * \param filename name of the .mesh file
  *
  * Save the size map to a medit ASCII (.sol) formatted file.
  */
-int DMG_saveSizeMap_medit(DMG_pMesh mesh, DMG_pSMap smap, char *filename);
+int DMG_saveSizeMap_medit(DMG_pMesh mesh, char *filename);
 
 /* Geometric routines */
 /**
@@ -295,7 +292,7 @@ int DMG_locTria(DMG_pMesh mesh, int start, double c[2]);
  */
 int DMG_locTria_brute(DMG_pMesh mesh, double c[2]);
 
-int DMG_computeSizeMap(DMG_pMesh mesh, DMG_pSMap smap);
+int DMG_computeSizeMap(DMG_pMesh mesh);
 
 int DMG_chkDelaunay(DMG_pMesh mesh);
 

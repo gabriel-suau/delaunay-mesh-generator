@@ -1,7 +1,7 @@
 #include "dmg.h"
 
 
-int DMG_loadMesh_medit(DMG_pMesh mesh, DMG_pSMap smap, char *filename) {
+int DMG_loadMesh_medit(DMG_pMesh mesh, char *filename) {
   FILE *file = NULL;
   DMG_pPoint ppt;
   DMG_pEdge pa;
@@ -57,7 +57,7 @@ int DMG_loadMesh_medit(DMG_pMesh mesh, DMG_pSMap smap, char *filename) {
   }
 
   /* Allocate memory */
-  if (DMG_allocMesh(mesh, smap) == DMG_FAILURE) {
+  if (DMG_allocMesh(mesh) == DMG_FAILURE) {
     fprintf(stderr, "Error! %s:%d : Could not allocate the mesh entities arrays.\n", __func__, __LINE__);
     return DMG_FAILURE;
   }
@@ -298,7 +298,7 @@ int DMG_saveQual_medit(DMG_pMesh mesh, char *filename) {
 }
 
 
-int DMG_saveSizeMap_medit(DMG_pMesh mesh, DMG_pSMap smap, char *filename) { 
+int DMG_saveSizeMap_medit(DMG_pMesh mesh, char *filename) { 
   DMG_pPoint ppt;
   FILE *file = NULL;
   char chain[127];
@@ -308,17 +308,8 @@ int DMG_saveSizeMap_medit(DMG_pMesh mesh, DMG_pSMap smap, char *filename) {
     fprintf(stderr, "Error: %s: mesh struct not allocated\n", __func__);
     return DMG_FAILURE;
   }
-  if (smap == NULL) {
-    fprintf(stderr, "Error: %s: sizeMap struct not allocated\n", __func__);
-    return DMG_FAILURE;
-  }
   if (!mesh->np) {
     fprintf(stderr, "Error: %s:%d: Empty mesh, cannot save the size map\n", __func__, __LINE__);
-    return DMG_FAILURE;
-  }
-  if (mesh->np != smap->np) {
-    fprintf(stderr, "Error: %s:%d: Mesh and sizeMap struct do not have the same number of vertices (%d and %d)\n",
-            __func__, __LINE__, mesh->np, smap->np);
     return DMG_FAILURE;
   }
 
@@ -341,7 +332,7 @@ int DMG_saveSizeMap_medit(DMG_pMesh mesh, DMG_pSMap smap, char *filename) {
   fprintf(file, "1 1\n");
   for (i = 1 ; i <= mesh->np ; i++) {
     ppt = &mesh->point[i];
-    fprintf(file, "%lf\n", smap->m[i]);
+    fprintf(file, "%lf\n", ppt->h);
   }
 
   /** End string*/

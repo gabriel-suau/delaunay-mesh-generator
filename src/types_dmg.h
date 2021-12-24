@@ -24,6 +24,7 @@ enum DMG_Flags {
 
 typedef struct {
   double c[2];
+  double h; /* Prescribed edge size at the vertex */
   int ref;
   int flag; /* Flag to tell il the point has been inserted in the triangulation */
   int tmp;
@@ -55,6 +56,7 @@ typedef struct {
   int ver;
   int dim;
   double min[2], max[2];
+  double hmin, hmax;
   int np, na, nt; /* Number of entities */
   int npmax, namax, ntmax; /* Max number of entities (size of the arrays) */
   int npu, nau, ntu; /* Indices of the first unused entities */
@@ -64,13 +66,6 @@ typedef struct {
   int *adja;
 } DMG_Mesh;
 typedef DMG_Mesh* DMG_pMesh;
-
-typedef struct {
-  int np;
-  double hmin, hmax;
-  double *m;
-} DMG_SMap;
-typedef DMG_SMap* DMG_pSMap;
 
 /* One node of the queue (implemented as a singly linked list) */
 typedef struct DMG_Qnode_s {

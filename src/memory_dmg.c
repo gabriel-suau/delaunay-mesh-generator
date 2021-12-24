@@ -1,7 +1,7 @@
 #include "dmg.h"
 
 
-int DMG_Init_mesh(DMG_pMesh *mesh, DMG_pSMap *smap) {
+int DMG_Init_mesh(DMG_pMesh *mesh) {
   *mesh = (DMG_pMesh)malloc(sizeof(DMG_Mesh));
 
   if (*mesh == NULL) {
@@ -13,26 +13,15 @@ int DMG_Init_mesh(DMG_pMesh *mesh, DMG_pSMap *smap) {
   (*mesh)->np = (*mesh)->na = (*mesh)->nt = 0;
   (*mesh)->npu = (*mesh)->nau = (*mesh)->ntu = 0;
   (*mesh)->npmax = (*mesh)->namax = (*mesh)->ntmax = 0;
-  (*mesh)->min[0] = (*mesh)->min[1] = DBL_MAX;
-  (*mesh)->max[0] = (*mesh)->max[1] = -DBL_MAX;
-
-  *smap = (DMG_pSMap)malloc(sizeof(DMG_SMap));
-
-  if (*smap == NULL) {
-    fprintf(stderr, "Error: %s: mesh struct allocation failed\n", __func__);
-    return DMG_FAILURE;
-  }
-
-  (*smap)->np = 0;
-  (*smap)->hmin = DBL_MAX;
-  (*smap)->hmax = -DBL_MAX;
+  (*mesh)->min[0] = (*mesh)->min[1] = (*mesh)->hmin = DBL_MAX;
+  (*mesh)->max[0] = (*mesh)->max[1] = (*mesh)->hmax = -DBL_MAX;
 
   return DMG_SUCCESS;
 }
 
 
-int DMG_Free_mesh(DMG_pMesh mesh, DMG_pSMap smap) {
-  if (mesh == NULL && smap == NULL) {
+int DMG_Free_mesh(DMG_pMesh mesh) {
+  if (mesh == NULL) {
     return DMG_SUCCESS;
   }
 
@@ -60,21 +49,11 @@ int DMG_Free_mesh(DMG_pMesh mesh, DMG_pSMap smap) {
     mesh = NULL;    
   }
 
-  if (smap != NULL) {
-    if (smap->m != NULL) {
-      free(smap->m);
-      smap->m = NULL;
-      smap->np = 0;
-    }
-    free(smap);
-    smap = NULL;
-  }
-
   return DMG_SUCCESS;
 }
 
 
-int DMG_allocMesh(DMG_pMesh mesh, DMG_pSMap smap) {
+int DMG_allocMesh(DMG_pMesh mesh) {
   int i;
 
   mesh->npmax = MAX2(1.5 * mesh->np, DMG_NPMAX);
@@ -103,12 +82,6 @@ int DMG_allocMesh(DMG_pMesh mesh, DMG_pSMap smap) {
 
   /* Allocate the adjacency table */
   mesh->adja = (int*) calloc(3 * (mesh->ntmax + 1), sizeof(int));
-
-  /* Allocte the smap struct */
-  smap->np = mesh->np;
-  smap->m = (double*) calloc(mesh->np + 1, sizeof(double));
-  if (smap->m == NULL)
-    return DMG_FAILURE;
 
   return DMG_SUCCESS;
 }
