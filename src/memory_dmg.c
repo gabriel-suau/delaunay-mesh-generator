@@ -145,16 +145,22 @@ int DMG_newTria(DMG_pMesh mesh) {
 
 void DMG_delTria(DMG_pMesh mesh, int it) {
   DMG_pTria pt;
-  int iadj;
+  int iadj, k, jadr;
 
   pt = &mesh->tria[it];
   memset(pt, 0, sizeof(DMG_Tria));
   pt->v[2] = mesh->ntu;
   pt->qual = 0.0;
 
+  /* Zero the adjacency */
   iadj = 3 * it;
-  if (mesh->adja)
+  if (mesh->adja) {
+    for (k = 0 ; k < 3 ; k++) {
+      jadr = mesh->adja[iadj];
+      mesh->adja[jadr] = 0;
+    }
     memset(&mesh->adja[iadj], 0, 3 * sizeof(int));
+  }
 
   mesh->ntu = it;
   if (it == mesh->nt) mesh->nt--;
