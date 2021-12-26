@@ -327,7 +327,7 @@ int DMG_saveQual_medit(DMG_pMesh mesh, char *filename) {
   for (i = 1 ; i <= mesh->nt ; i++) {
     pt = &mesh->tria[i];
     if (!DMG_TOK(pt)) continue;
-    fprintf(file, "%d\n", pt->ref);
+    fprintf(file, "%lf\n", pt->qual);
   }
 
   /** End string*/
