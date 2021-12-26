@@ -312,7 +312,9 @@ int DMG_markSubDomains(DMG_pMesh mesh) {
     flag = 0;
 
     for (it = 1 ; it <= mesh->nt ; it++) {
-      if (mesh->tria[it].ref == -1) {
+      pt = &mesh->tria[it];
+      if (!DMG_TOK(pt)) continue;
+      if (pt->ref == -1) {
         flag = 1;
         break;
       }
@@ -322,13 +324,14 @@ int DMG_markSubDomains(DMG_pMesh mesh) {
 
   DMG_freeQueue(q);
 
-  /* Search for one triangle adjacent to a BB triangle by a constrained edge. */
-  /* Delete all triangles that do not have its color */
+  /* Search for one triangle adjacent to a BB triangle by a constrained edge : this 
+   * triangle it belongs to the domain. Loop over the triangles. For each triangle 
+   * jt, set its ref to 0 if it has the same color as it, else set its ref to 1. */
   it = ppt->tmp;
   color = mesh->tria[it].ref;
   for (it = 1 ; it <= mesh->nt ; it++) {
     pt = &mesh->tria[it];
-    if (pt->ref != color) continue;
+    if (!DMG_TOK(pt) || pt->ref != color) continue;
     adja = &mesh->adja[3 * it];
     for (k = 0 ; k < 3 ; k++) {
       it = adja[k] / 3;
@@ -343,7 +346,6 @@ int DMG_markSubDomains(DMG_pMesh mesh) {
         }
       }
     }
-
   }
 
  found:
@@ -352,16 +354,10 @@ int DMG_markSubDomains(DMG_pMesh mesh) {
     pt = &mesh->tria[k];
     if (!DMG_TOK(pt)) continue;
     if (pt->ref != color)
-      DMG_delTria(mesh, k);
+      pt->ref = 1;
     else
       pt->ref = 0;
   }
-
-  /* Delete the bounding box vertices */
-  DMG_delPoint(mesh, mesh->npi+3);
-  DMG_delPoint(mesh, mesh->npi+2);
-  DMG_delPoint(mesh, mesh->npi+1);
-  DMG_delPoint(mesh, mesh->npi);
 
   return DMG_SUCCESS;
 }
@@ -390,7 +386,7 @@ int DMG_refineDelaunay(DMG_pMesh mesh) {
     for (it = 1 ; it <= mesh->nt ; it++) {
       pt = &mesh->tria[it];
 
-      if (!DMG_TOK(pt)) continue;
+      if (!DMG_TOK(pt) || pt->ref == 1) continue;
 
       jt = it;
 
@@ -446,6 +442,7 @@ int DMG_refineDelaunay(DMG_pMesh mesh) {
 
     } /* for it <= mesh->nt */
 
+    /* TODO: Filter out points using a background grid */
     for (k = mesh->np - ptcount + 1; k <= mesh->np ; k++) {
       jt = DMG_insertPoint(mesh, k, jt);
     }
