@@ -383,10 +383,12 @@ int DMG_refineDelaunay(DMG_pMesh mesh) {
 
   /* Loop through all the edges of the mesh. The hedge->adj1 field is used to
      mark the edges that have already been visited from another triangle. */
-  for (it = 1 ; it < mesh->nt ; it++) {
+  for (it = 1 ; it <= mesh->nt ; it++) {
     pt = &mesh->tria[it];
 
     if (!DMG_TOK(pt)) continue;
+
+    jt = it;
 
     for (k = 0 ; k < 3 ; k++) {
       a = pt->v[DMG_tria_vert[k + 1]];
@@ -442,9 +444,8 @@ int DMG_refineDelaunay(DMG_pMesh mesh) {
 
   free(htab); htab = NULL;
 
-  it = 1;
   for (k = mesh->np - ptcount + 1; k <= mesh->np ; k++) {
-    it = DMG_insertPoint(mesh, k, it);
+    jt = DMG_insertPoint(mesh, k, jt);
   }
 
   return DMG_SUCCESS;
