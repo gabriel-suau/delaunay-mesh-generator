@@ -30,9 +30,9 @@ For the moment, DMG can only read and write meshes in the ASCII [Medit](https://
 Here is a small checklist of the implemented features and the features that still need to be implemented :
 - [x] Read a discretized boundary of a 2D domain from a Medit formatted file,
 - [x] Create a rectangular bounding box divided in 2 triangles,
-- [x] Insert the boundary points using Bowyer-Watson algorithm,
-- [ ] Enforce the boundary edges,
-- [ ] Delete the bounding box,
+- [x] Insert the boundary points using the Bowyer-Watson algorithm,
+- [x] Enforce the boundary edges,
+- [x] Mark the subdomains and delete the bounding box,
 - [ ] Refine the mesh by inserting volume points in order to achieve a desired edge length.
 
 ## Documentation
