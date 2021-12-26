@@ -14,10 +14,14 @@ int DMG_hashHedge(DMG_pMesh mesh, DMG_Hedge *htab) {
     return DMG_FAILURE;
   }
 
-  hnxt = hsize = mesh->np;
+  hsize = mesh->np;
+  hnxt = mesh->np + 1;
 
   for (i = 1 ; i <= mesh->nt ; i++) {
     pt = &mesh->tria[i];
+
+    if (!DMG_TOK(pt)) continue;
+
     /* Run through the edges of the triangle */
     for (j = 0 ; j < 3 ; j++) {
       a = pt->v[DMG_tria_vert[j+1]];
@@ -79,7 +83,7 @@ int DMG_setAdja(DMG_pMesh mesh) {
   }
 
   /** Create the hash table for the edges */
-  htab = (DMG_Hedge*) calloc(3 * (mesh->ntmax + 1), sizeof(DMG_Hedge));
+  htab = (DMG_Hedge*) calloc(3 * (mesh->nt + 1), sizeof(DMG_Hedge));
 
   DMG_hashHedge(mesh, htab);
 
