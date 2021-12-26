@@ -166,13 +166,79 @@ void DMG_delTria(DMG_pMesh mesh, int it) {
   if (it == mesh->nt) mesh->nt--;
 }
 
-int DMG_packMesh(DMG_pMesh mesh) {
+
+int DMG_packPoints(DMG_pMesh mesh) {
+  DMG_pPoint ppt, ppt1;
+  DMG_pTria pt;
+  int ip, k, np;
+
+  if (!mesh->np) {
+    return DMG_SUCCESS;
+  }
+
+  np = 0;
+
+  /* Mark the packed points */
+  for (k = 1 ; k <= mesh->np ; k++) {
+    ppt = &mesh->point[k];
+    if (!DMG_VOK(ppt)) continue;
+    ppt->tmp = ++np;
+  }
+
+  /* Update the tria vertices indices */
+  for (k = 1 ; k <= mesh->nt ; k++) {
+    pt = &mesh->tria[k];
+    if (!DMG_TOK(pt)) continue;
+    pt->v[0] = mesh->point[pt->v[0]].tmp;
+    pt->v[1] = mesh->point[pt->v[1]].tmp;
+    pt->v[2] = mesh->point[pt->v[2]].tmp;
+  }
+
+  np = 0;
+
+  /* Pack the points */
+  ip = 1;
+  for (k = 1; k <= mesh->np ; k++) {
+    ppt = &mesh->point[k];
+    if (!DMG_VOK(ppt)) continue;
+
+    np++;
+
+    if (k != ip) {
+      ppt1 = &mesh->point[ip];
+      memmove(ppt1, ppt, sizeof(DMG_Point));
+      memset(ppt, 0, sizeof(DMG_Point));
+      ppt->tag = DMG_NULPOINT;
+    }
+
+    ip++;
+  }
+  mesh->np = np;
+
+  for(k = 1 ; k <= mesh->np ; k++)
+    mesh->point[k].tmp = 0;
+
+  if (mesh->np >= mesh->npmax - 1)
+    mesh->npu = 0;
+  else
+    mesh->npu = mesh->np + 1;
+  
+  if (mesh->npu)
+    for (k = mesh->npu ; k < mesh->npmax - 1 ; k++)
+      mesh->point[k].tmp = k + 1;
+
+  return DMG_SUCCESS;
+}
+
+int DMG_packTria(DMG_pMesh mesh) {
   DMG_pTria pt, pt1;
-  int it, k, iadj, *adja, *adja1;
+  int it, k, iadj, iadj1, iadjv, *adja, *adja1, *adjav, voy;
 
   if (!mesh->nt) {
     return DMG_SUCCESS;
   }
+
+  /* TODO : fix the buggy adjacency update */
 
   it = 1;
   do {
@@ -182,13 +248,15 @@ int DMG_packMesh(DMG_pMesh mesh) {
       memcpy(pt, pt1, sizeof(DMG_Tria));
       iadj = 3 * it;
       adja = &mesh->adja[iadj];
-      iadj = 3 * mesh->nt;
-      adja1 = &mesh->adja[iadj];
+      iadj1 = 3 * mesh->nt;
+      adja1 = &mesh->adja[iadj1];
       for (k = 0 ; k < 3 ; k++) {
         adja[k] = adja1[k];
-        if (!adja[k]) continue;
-        iadj = adja[k];
-        mesh->adja[iadj] = 3 * it + k;;
+        if (!adja1[k]) continue;
+        iadjv = 3 * (adja1[k] / 3);
+        adjav = &mesh->adja[iadjv];
+        voy = k;
+        adjav[adja1[k]%3] = 3 * it + voy;
       }
       DMG_delTria(mesh, mesh->nt);
     }
@@ -202,6 +270,13 @@ int DMG_packMesh(DMG_pMesh mesh) {
   if (mesh->ntu)
     for (k = mesh->ntu ; k < mesh->ntmax - 1 ; k++)
       mesh->tria[k].v[2] = k + 1;
-      
+
+  return DMG_SUCCESS;
+}
+
+
+int DMG_packMesh(DMG_pMesh mesh) {
+  DMG_packTria(mesh);
+  DMG_packPoints(mesh);
   return DMG_SUCCESS;
 }

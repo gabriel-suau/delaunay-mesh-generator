@@ -469,10 +469,10 @@ int DMG_removeExterior(DMG_pMesh mesh) {
     if (pt->ref == 1) DMG_delTria(mesh, k);
   }
 
-  /* DMG_delPoint(mesh, mesh->npi); */
-  /* DMG_delPoint(mesh, mesh->npi+1); */
-  /* DMG_delPoint(mesh, mesh->npi+2); */
-  /* DMG_delPoint(mesh, mesh->npi+3); */
+  DMG_delPoint(mesh, mesh->npi);
+  DMG_delPoint(mesh, mesh->npi+1);
+  DMG_delPoint(mesh, mesh->npi+2);
+  DMG_delPoint(mesh, mesh->npi+3);
 
   return DMG_SUCCESS;
 }
