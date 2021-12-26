@@ -154,9 +154,9 @@ void DMG_delTria(DMG_pMesh mesh, int it) {
 
   /* Zero the adjacency */
   iadj = 3 * it;
-  if (mesh->adja) {
+  if (mesh->adja != NULL) {
     for (k = 0 ; k < 3 ; k++) {
-      jadr = mesh->adja[iadj];
+      jadr = mesh->adja[iadj + k];
       mesh->adja[jadr] = 0;
     }
     memset(&mesh->adja[iadj], 0, 3 * sizeof(int));
