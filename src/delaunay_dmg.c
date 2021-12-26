@@ -63,6 +63,9 @@ int DMG_initDelaunay(DMG_pMesh mesh) {
   assert ( ip3 == mesh->np-1 );
   assert ( ip4 == mesh->np );
 
+  /* Keep in memory the index of the firt BB vertex */
+  mesh->npi = ip1;
+
   /* Create the 2 first triangles */
   it1 = DMG_newTria(mesh);
   pt = &mesh->tria[it1];
@@ -339,8 +342,6 @@ int DMG_markSubDomains(DMG_pMesh mesh) {
 
  found:
   color = mesh->tria[it].ref;
-  printf("%d\n", color);
-
   for (k = 1 ; k <= mesh->nt ; k++) {
     pt = &mesh->tria[k];
     if (!DMG_TOK(pt)) continue;

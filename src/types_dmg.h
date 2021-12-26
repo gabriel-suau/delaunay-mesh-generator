@@ -64,6 +64,7 @@ typedef struct {
   int np, na, nt; /* Number of entities */
   int npmax, namax, ntmax; /* Max number of entities (size of the arrays) */
   int npu, nau, ntu; /* Indices of the first unused entities */
+  int npi; /* Used to keep the index of the first BB vertex */
   DMG_pPoint point;
   DMG_pEdge edge; /* Store the boundary edges (all those edges must exist in the mesh at the end of the triangulation)*/
   DMG_pTria tria;
