@@ -143,7 +143,7 @@ int DMG_markSubDomains(DMG_pMesh mesh);
 /**
  * \param mesh pointer toward the mesh structure
  *
- * Apply the Ruppert's delaunay refinement algorithm to the mesh.
+ * Field point creation using one of the methods listed in the DMG_FieldPointMethod enum.
  */
 int DMG_refineDelaunay(DMG_pMesh mesh);
 
