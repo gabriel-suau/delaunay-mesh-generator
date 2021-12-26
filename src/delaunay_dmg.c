@@ -378,77 +378,83 @@ int DMG_refineDelaunay(DMG_pMesh mesh) {
 
   DMG_computeSizeMap(mesh);
 
-  DMG_hashHedge(mesh, htab);
+  /* Cut the edges until all are saturated */
+  do {
+    DMG_hashHedge(mesh, htab);
 
-  hsize = mesh->np;
-  ptcount = 0;
+    hsize = mesh->np;
+    ptcount = 0;
 
-  /* Loop through all the edges of the mesh. The hedge->adj1 field is used to
-     mark the edges that have already been visited from another triangle. */
-  for (it = 1 ; it <= mesh->nt ; it++) {
-    pt = &mesh->tria[it];
+    /* Loop through all the edges of the mesh. The hedge->adj1 field is used to
+       mark the edges that have already been visited from another triangle. */
+    for (it = 1 ; it <= mesh->nt ; it++) {
+      pt = &mesh->tria[it];
 
-    if (!DMG_TOK(pt)) continue;
+      if (!DMG_TOK(pt)) continue;
 
-    jt = it;
+      jt = it;
 
-    for (k = 0 ; k < 3 ; k++) {
-      a = pt->v[DMG_tria_vert[k + 1]];
-      b = pt->v[DMG_tria_vert[k + 2]];
-      vmin = MIN2(a, b);
-      vmax = MAX2(a, b);
+      for (k = 0 ; k < 3 ; k++) {
+        a = pt->v[DMG_tria_vert[k + 1]];
+        b = pt->v[DMG_tria_vert[k + 2]];
+        vmin = MIN2(a, b);
+        vmax = MAX2(a, b);
 
-      key = (KA * vmin + KB *vmax) % hsize;
+        key = (KA * vmin + KB *vmax) % hsize;
 
-      do {
-        hedge = &htab[key];
+        do {
+          hedge = &htab[key];
 
-        /* The edge has already been visited from another triangle */
-        if (!hedge->adj1 || !(hedge->a == vmin && hedge->b == vmax)) {
-          key = htab[key].nxt;
-        }
-        else {
-          hedge->adj1 = 0;
-          ppta = &mesh->point[a];
-          pptb = &mesh->point[b];
+          /* The edge has already been visited from another triangle */
+          if (!hedge->adj1 || !(hedge->a == vmin && hedge->b == vmax)) {
+            key = htab[key].nxt;
+          }
+          else {
+            hedge->adj1 = 0;
+            ppta = &mesh->point[a];
+            pptb = &mesh->point[b];
 
-          ca = ppta->c;
-          cb = pptb->c;
-          memcpy(cc, ca, 2 * sizeof(double));
+            ca = ppta->c;
+            cb = pptb->c;
+            memcpy(cc, ca, 2 * sizeof(double));
 
-          d = DMG_length(ca, cb);
-          n = MAX2((int)(2.0 * d / (ppta->h + pptb->h)) - 1, 0);
-          r = (pptb->h - ppta->h) / (n + 2);
+            d = DMG_length(ca, cb);
+            n = MAX2((int)(2.0 * d / (ppta->h + pptb->h)) - 1, 0);
+            r = (pptb->h - ppta->h) / (n + 2);
 
-          d = 1.0 / d;
-          nab[0] = (cb[0] - ca[0]) * d;
-          nab[1] = (cb[1] - ca[1]) * d;
-          alpha = ppta->h;
+            d = 1.0 / d;
+            nab[0] = (cb[0] - ca[0]) * d;
+            nab[1] = (cb[1] - ca[1]) * d;
+            alpha = ppta->h;
 
-          for (j = 0 ; j < n ; j++) {
-            alpha += r;
-            cc[0] = cc[0] + alpha * nab[0];
-            cc[1] = cc[1] + alpha * nab[1];
-            c = DMG_newPoint(mesh, cc);
-            mesh->point[c].h = alpha;
+            for (j = 0 ; j < n ; j++) {
+              alpha += r;
+              cc[0] = cc[0] + alpha * nab[0];
+              cc[1] = cc[1] + alpha * nab[1];
+              c = DMG_newPoint(mesh, cc);
+              mesh->point[c].h = alpha;
+            }
+
+            ptcount += n;
+
+            break;
           }
 
-          ptcount += n;
+        } while (key != 0);
 
-          break;
-        }
+      } /* for k < 3 */
 
-      } while (key != 0);
+    } /* for it <= mesh->nt */
 
-    } /* for k < 3 */
+    for (k = mesh->np - ptcount + 1; k <= mesh->np ; k++) {
+      jt = DMG_insertPoint(mesh, k, jt);
+    }
 
-  } /* for it <= mesh->nt */
+    memset(htab, 0, 3 * (mesh->ntmax + 1) * sizeof(DMG_Hedge));
+
+  } while (ptcount);
 
   free(htab); htab = NULL;
-
-  for (k = mesh->np - ptcount + 1; k <= mesh->np ; k++) {
-    jt = DMG_insertPoint(mesh, k, jt);
-  }
 
   return DMG_SUCCESS;
 }
