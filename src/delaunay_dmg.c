@@ -256,21 +256,27 @@ int DMG_markSubDomains(DMG_pMesh mesh) {
   DMG_Queue *q;
   int it, ia, k, color, iadj, *adja, a, b, flag;
 
+  /* Assign ref = -1 to all triangles and assign the tmp field of
+     each point to the index of one triangle it belongs to. */
   for (it = 1 ; it <= mesh->nt ; it++) {
     pt = &mesh->tria[it];
     if (!DMG_TOK(pt)) continue;
     pt->ref = -1;
+    for (k = 0 ; k < 3 ; k++) {
+      mesh->point[pt->v[k]].tmp = it;
+    }
   }
 
   color = 0;
   flag = 1;
 
-  ppt = &mesh->point[mesh->np];
+  ppt = &mesh->point[mesh->npi];
   it = ppt->tmp;
   pt = &mesh->tria[it];
   pt->ref = color;
 
   q = DMG_createQueue();
+
   while (flag) {
 
     /* BFS */
@@ -350,17 +356,96 @@ int DMG_markSubDomains(DMG_pMesh mesh) {
   }
 
   /* Delete the bounding box vertices */
-  DMG_delPoint(mesh, mesh->np);
-  DMG_delPoint(mesh, mesh->np);
-  DMG_delPoint(mesh, mesh->np);
-  DMG_delPoint(mesh, mesh->np);
+  DMG_delPoint(mesh, mesh->npi+3);
+  DMG_delPoint(mesh, mesh->npi+2);
+  DMG_delPoint(mesh, mesh->npi+1);
+  DMG_delPoint(mesh, mesh->npi);
 
   return DMG_SUCCESS;
 }
 
 
-int DMG_refineDelaunay(DMG_pMesh mesh, DMG_pSMap smap) {
-  DMG_computeSizeMap(mesh, smap);
+int DMG_refineDelaunay(DMG_pMesh mesh) {
+  DMG_pTria pt;
+  DMG_pPoint ppta, pptb;
+  DMG_Hedge *htab, *hedge;
+  int it, j, k, a, b, c, vmin, vmax, key, hsize, n, ptcount;
+  double *ca, *cb, nab[2], cc[2], d, r, alpha;
+
+  htab = (DMG_Hedge*) calloc(3 * (mesh->ntmax + 1), sizeof(DMG_Hedge));
+
+  DMG_computeSizeMap(mesh);
+
+  DMG_hashHedge(mesh, htab);
+
+  hsize = mesh->np;
+  ptcount = 0;
+
+  /* Loop through all the edges of the mesh. The hedge->adj1 field is used to
+     mark the edges that have already been visited from another triangle. */
+  for (it = 1 ; it < mesh->nt ; it++) {
+    pt = &mesh->tria[it];
+
+    if (!DMG_TOK(pt)) continue;
+
+    for (k = 0 ; k < 3 ; k++) {
+      a = pt->v[DMG_tria_vert[k + 1]];
+      b = pt->v[DMG_tria_vert[k + 2]];
+      vmin = MIN2(a, b);
+      vmax = MAX2(a, b);
+
+      key = (KA * vmin + KB *vmax) % hsize;
+
+      do {
+        hedge = &htab[key];
+
+        /* The edge has already been visited from another triangle */
+        if (!hedge->adj1 || !(hedge->a == vmin && hedge->b == vmax)) {
+          key = htab[key].nxt;
+        }
+        else {
+          hedge->adj1 = 0;
+          ppta = &mesh->point[a];
+          pptb = &mesh->point[b];
+
+          ca = ppta->c;
+          cb = pptb->c;
+          memcpy(cc, ca, 2 * sizeof(double));
+
+          d = DMG_length(ca, cb);
+          n = MAX2((int)(2.0 * d / (ppta->h + pptb->h)) - 1, 0);
+          r = (pptb->h - ppta->h) / (n + 2);
+
+          d = 1.0 / d;
+          nab[0] = (cb[0] - ca[0]) * d;
+          nab[1] = (cb[1] - ca[1]) * d;
+          alpha = ppta->h;
+
+          for (j = 0 ; j < n ; j++) {
+            alpha += r;
+            cc[0] = cc[0] + alpha * nab[0];
+            cc[1] = cc[1] + alpha * nab[1];
+            c = DMG_newPoint(mesh, cc);
+            mesh->point[c].h = alpha;
+          }
+
+          ptcount += n;
+
+          break;
+        }
+
+      } while (key != 0);
+
+    } /* for k < 3 */
+
+  } /* for it <= mesh->nt */
+
+  free(htab); htab = NULL;
+
+  it = 1;
+  for (k = mesh->np - ptcount + 1; k <= mesh->np ; k++) {
+    it = DMG_insertPoint(mesh, k, it);
+  }
 
   return DMG_SUCCESS;
 }
