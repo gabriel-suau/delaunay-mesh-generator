@@ -136,7 +136,7 @@ int DMG_enforceBndry(DMG_pMesh mesh);
 /**
  * \param mesh pointer toward the mesh structure
  *
- * Remove the triangles outside the domain boundaries.
+ * Mark the triangles that are exterior to the domain.
  */
 int DMG_markSubDomains(DMG_pMesh mesh);
 
@@ -146,6 +146,14 @@ int DMG_markSubDomains(DMG_pMesh mesh);
  * Field point creation using one of the methods listed in the DMG_FieldPointMethod enum.
  */
 int DMG_refineDelaunay(DMG_pMesh mesh);
+
+/**
+ * \param mesh pointer toward the mesh structure
+ *
+ * Delete the triangles that were marked in the markSubdomains function, 
+ * as well as the 4 BB vertices.
+ */
+int DMG_removeExterior(DMG_pMesh mesh);
 
 /* I/O */
 /**

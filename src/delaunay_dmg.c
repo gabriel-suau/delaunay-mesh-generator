@@ -13,7 +13,9 @@ int DMG_delaunay(DMG_pMesh mesh) {
 
   DMG_refineDelaunay(mesh);
 
-  /* DMG_packMesh(mesh); */
+  DMG_removeExterior(mesh);
+
+  DMG_packMesh(mesh);
 
   return DMG_SUCCESS;
 }
@@ -452,6 +454,25 @@ int DMG_refineDelaunay(DMG_pMesh mesh) {
   } while (ptcount);
 
   free(htab); htab = NULL;
+
+  return DMG_SUCCESS;
+}
+
+
+int DMG_removeExterior(DMG_pMesh mesh) {
+  DMG_pTria pt;
+  int k;
+
+  for (k = 1 ; k <= mesh->nt ; k++) {
+    pt = &mesh->tria[k];
+    if (!DMG_TOK(pt)) continue;
+    if (pt->ref == 1) DMG_delTria(mesh, k);
+  }
+
+  /* DMG_delPoint(mesh, mesh->npi); */
+  /* DMG_delPoint(mesh, mesh->npi+1); */
+  /* DMG_delPoint(mesh, mesh->npi+2); */
+  /* DMG_delPoint(mesh, mesh->npi+3); */
 
   return DMG_SUCCESS;
 }
