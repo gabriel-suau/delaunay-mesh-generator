@@ -11,9 +11,9 @@ int DMG_delaunay(DMG_pMesh mesh) {
 
   DMG_markSubDomains(mesh);
 
-  DMG_packMesh(mesh);
+  DMG_refineDelaunay(mesh);
 
-  DMG_refineDelaunay(mesh, smap);
+  /* DMG_packMesh(mesh); */
 
   return DMG_SUCCESS;
 }
