@@ -12,7 +12,7 @@
 
 #define DMG_REALLOC_MULT 1.5
 
-#define DMG_LIST_SIZE 64
+#define DMG_LIST_SIZE 256
 
 /* Used for the hash function */
 #define KA 7
