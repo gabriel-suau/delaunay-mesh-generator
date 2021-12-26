@@ -393,4 +393,9 @@ int DMG_enQueue(DMG_Queue *q, int k);
 int DMG_deQueue(DMG_Queue *q);
 int DMG_qIsEmpty(DMG_Queue *q);
 
+/* Grid manipulations */
+DMG_Grid* DMG_createGrid(double min[2], double max[2], double h);
+void DMG_freeGrid(DMG_Grid *g);
+int DMG_gCell(DMG_Grid *g, double c[2]);
+
 #endif /* DMG_H */

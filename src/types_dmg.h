@@ -72,6 +72,14 @@ typedef struct {
 } DMG_Mesh;
 typedef DMG_Mesh* DMG_pMesh;
 
+/* Grid structure */
+typedef struct {
+  double h; /* Step size */
+  double xmin, ymin;
+  int nx, ny; /* Number of cells in the x and y directions. */
+  int *ucell; /* Array of bool indicating if cell (i * nx + j) contains a vertex of the mesh or not */
+} DMG_Grid;
+
 /* One node of the queue (implemented as a singly linked list) */
 typedef struct DMG_Qnode_s {
   int key;
