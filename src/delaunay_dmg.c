@@ -353,6 +353,8 @@ int DMG_markSubDomains(DMG_pMesh mesh) {
     if (!DMG_TOK(pt)) continue;
     if (pt->ref != color)
       DMG_delTria(mesh, k);
+    else
+      pt->ref = 0;
   }
 
   /* Delete the bounding box vertices */
@@ -369,7 +371,7 @@ int DMG_refineDelaunay(DMG_pMesh mesh) {
   DMG_pTria pt;
   DMG_pPoint ppta, pptb;
   DMG_Hedge *htab, *hedge;
-  int it, j, k, a, b, c, vmin, vmax, key, hsize, n, ptcount;
+  int it, jt, j, k, a, b, c, vmin, vmax, key, hsize, n, ptcount;
   double *ca, *cb, nab[2], cc[2], d, r, alpha;
 
   htab = (DMG_Hedge*) calloc(3 * (mesh->ntmax + 1), sizeof(DMG_Hedge));
