@@ -46,10 +46,6 @@ int main(int argc, char **argv)
   if (DMG_delaunay(mesh) == DMG_FAILURE)
     goto free_and_return;
 
-  /** Compute and display the quality of the mesh */
-  DMG_computeQual(mesh);
-  DMG_displayQualHisto(mesh, nclass);
-
   /** Save the mesh */
   if (DMG_saveMesh_medit(mesh, fileout) == DMG_FAILURE)
     goto free_and_return;

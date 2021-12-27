@@ -7,8 +7,8 @@
 
 #define DMG_ALPHA_2D 3.464101615137755 /* 6. / sqrt(3.) */
 
-#define DMG_NPMAX 5000
-#define DMG_NTMAX 10000
+#define DMG_NPMAX 10000
+#define DMG_NTMAX 20000
 
 #define DMG_REALLOC_MULT 1.5
 
@@ -217,6 +217,7 @@ int DMG_saveSizeMap_medit(DMG_pMesh mesh, char *filename);
  */
 double DMG_orient(const double a[2], const double b[2], const double c[2]);
 
+double DMG_lengthsq(const double a[2], const double b[2]);
 double DMG_length(const double a[2], const double b[2]);
 
 /**

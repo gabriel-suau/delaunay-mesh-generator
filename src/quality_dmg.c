@@ -100,6 +100,7 @@ int DMG_displayQualHisto(DMG_pMesh mesh, int nclass) {
   for (k = nclass - 1 ; k >= 0 ; k--) {
     fprintf(stdout, "    %4.2f < Q < %4.2f : %4.2f %% (%d)\n", k/(float)nclass, (k+1)/(float)nclass, 100.*hist[k]/(float)nt, hist[k]);
   }
+  fprintf(stdout, "\n");
 
   return DMG_SUCCESS;
 }

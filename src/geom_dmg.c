@@ -206,14 +206,17 @@ int DMG_locTria(DMG_pMesh mesh, int start, double c[2]) {
   return it;
 }
 
-
-double DMG_length(const double a[2], const double b[2]) {
+double DMG_lengthsq(const double a[2], const double b[2]) {
   double abx, aby;
 
   abx = b[0] - a[0];
   aby = b[1] - a[1];
 
-  return sqrt(abx * abx + aby * aby);
+  return abx * abx + aby * aby;
+}
+
+double DMG_length(const double a[2], const double b[2]) {
+  return sqrt(DMG_lengthsq(a, b));
 }
 
 
