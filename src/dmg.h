@@ -22,13 +22,14 @@
 #define MIN2(a, b) (((a) <= (b)) ? (a) : (b))
 #define ABS(a) (((a) >= 0.) ? (a) : (-a))
 
-#define DMG_VOK(ppt) (ppt && ((ppt)->tag != DMG_NULPOINT))
+#define DMG_VOK(ppt) (ppt && ((ppt)->tag != DMG_NULPT))
 #define DMG_TOK(pt)  (pt && ((pt)->v[0] > 0))
 
 /* Useful to avoid modulos when going through the vertices/edges of a triangle */
 static const int DMG_tria_vert[5] = {0, 1, 2, 0, 1};
 
-/* Creation and deletion of the main structures */
+
+/* memory_dmg.c */
 /**
  * \param mesh pointer toward a pointer toward the mesh structure
  * \return DMG_SUCCESS if success, DMG_FAILURE if fail
@@ -39,7 +40,6 @@ static const int DMG_tria_vert[5] = {0, 1, 2, 0, 1};
  * is not lost when exiting the function.
  */
 int DMG_Init_mesh(DMG_pMesh *mesh);
-
 /**
  * \param mesh pointer toward the mesh structure
  * \return DMG_SUCCESS (cannot fail)
@@ -47,7 +47,6 @@ int DMG_Init_mesh(DMG_pMesh *mesh);
  * Free the mesh structure and their arrays.
  */
 int DMG_Free_mesh(DMG_pMesh mesh);
-
 /**
  * \param mesh pointer toward the mesh structure
  * \return DMG_SUCCESS if success, DMG_FAILURE if fail
@@ -56,7 +55,6 @@ int DMG_Free_mesh(DMG_pMesh mesh);
  * Initialize the unused chain to keep track of the empty available points and tria.
  */
 int DMG_allocMesh(DMG_pMesh mesh);
-
 /**
  * \param mesh pointer toward the mesh structure
  * \param c coordinates of the new point
@@ -66,7 +64,6 @@ int DMG_allocMesh(DMG_pMesh mesh);
  * the unused chain.
  */
 int DMG_newPoint(DMG_pMesh mesh, double c[2]);
-
 /**
  * \param mesh pointer toward the mesh structure
  * \param ip global index of the point
@@ -74,7 +71,6 @@ int DMG_newPoint(DMG_pMesh mesh, double c[2]);
  * Delete point ip of the mesh, and update the unused chain.
  */
 void DMG_delPoint(DMG_pMesh mesh, int ip);
-
 /**
  * \param mesh pointer toward the mesh structure
  * \return global index of the new tria if success, else return 0 (no slot available)
@@ -83,7 +79,6 @@ void DMG_delPoint(DMG_pMesh mesh, int ip);
  * the unused chain.
  */
 int DMG_newTria(DMG_pMesh mesh);
-
 /**
  * \param mesh pointer toward the mesh structure
  * \param it global index of the triangle
@@ -91,7 +86,6 @@ int DMG_newTria(DMG_pMesh mesh);
  * Delete triangle it of the mesh, zero the adjacency relationship, and update the unused chain.
  */
 void DMG_delTria(DMG_pMesh mesh, int it);
-
 /**
  * \param mesh pointer toward the mesh structure
  *
@@ -99,7 +93,8 @@ void DMG_delTria(DMG_pMesh mesh, int it);
  */
 int DMG_packMesh(DMG_pMesh mesh);
 
-/* Global mesh manipulations */
+
+/* delaunay_dmg.c */
 /**
  * \param mesh pointer toward the mesh structure
  *
@@ -108,7 +103,6 @@ int DMG_packMesh(DMG_pMesh mesh);
  * of the mesh structure.
  */
 int DMG_delaunay(DMG_pMesh mesh);
-
 /**
  * \param mesh pointer toward the mesh structure
  *
@@ -117,7 +111,7 @@ int DMG_delaunay(DMG_pMesh mesh);
  * are triangles 1 and 2.
  */
 int DMG_initDelaunay(DMG_pMesh mesh);
-
+int DMG_insertPoint(DMG_pMesh mesh, int ip, int start);
 /**
  * \param mesh pointer toward the mesh structure
  *
@@ -125,21 +119,6 @@ int DMG_initDelaunay(DMG_pMesh mesh);
  * are mesh->np-3 to mesh->np and have already been inserted).
  */
 int DMG_insertBdryPoints(DMG_pMesh mesh);
-
-/**
- * \param mesh pointer toward the mesh structure
- *
- * Enforce the constrained edges in the mesh.
- */
-int DMG_enforceBndry(DMG_pMesh mesh);
-
-/**
- * \param mesh pointer toward the mesh structure
- *
- * Mark the triangles that are exterior to the domain.
- */
-int DMG_markSubDomains(DMG_pMesh mesh);
-
 /**
  * \param mesh pointer toward the mesh structure
  *
@@ -147,6 +126,23 @@ int DMG_markSubDomains(DMG_pMesh mesh);
  */
 int DMG_refineDelaunay(DMG_pMesh mesh);
 
+
+/* enforcement_dmg.c */
+/**
+ * \param mesh pointer toward the mesh structure
+ *
+ * Enforce the constrained edges in the mesh.
+ */
+int DMG_enforceBndry(DMG_pMesh mesh);
+
+
+/* domains_dmg.c */
+/**
+ * \param mesh pointer toward the mesh structure
+ *
+ * Mark the triangles that are exterior to the domain.
+ */
+int DMG_markSubDomains(DMG_pMesh mesh);
 /**
  * \param mesh pointer toward the mesh structure
  *
@@ -155,7 +151,15 @@ int DMG_refineDelaunay(DMG_pMesh mesh);
  */
 int DMG_removeExterior(DMG_pMesh mesh);
 
-/* I/O */
+/**
+ * \param mesh pointer toward the mesh structure
+ *
+ * Perform mesh optimizations (swaps, collapses, smoothing).
+ */
+int DMG_optimizeMesh(DMG_pMesh mesh);
+
+
+/* inout_dmg.c */
 /**
  * \param mesh pointer toward the mesh structure
  * \param filename name of the .mesh file
@@ -163,7 +167,6 @@ int DMG_removeExterior(DMG_pMesh mesh);
  * Load a mesh from a medit ASCII (.mesh) formatted file.
  */
 int DMG_loadMesh_medit(DMG_pMesh mesh, char *filename);
-
 /**
  * \param mesh pointer toward the mesh structure
  * \param filename name of the .mesh file
@@ -171,7 +174,6 @@ int DMG_loadMesh_medit(DMG_pMesh mesh, char *filename);
  * Save a mesh to a medit ASCII (.mesh) formatted file.
  */
 int DMG_saveMesh_medit(DMG_pMesh mesh, char *filename);
-
 /**
  * \param mesh pointer toward the mesh structure
  * \param filename name of the .mesh file
@@ -180,7 +182,6 @@ int DMG_saveMesh_medit(DMG_pMesh mesh, char *filename);
  * The z coordinate is set to zero.
  */
 int DMG_saveMeshAs3D_medit(DMG_pMesh mesh, char *filename);
-
 /**
  * \param mesh pointer toward the mesh structure
  * \param filename name of the .mesh file
@@ -188,7 +189,6 @@ int DMG_saveMeshAs3D_medit(DMG_pMesh mesh, char *filename);
  * Save the quality of the mesh to a medit ASCII (.sol) formatted file.
  */
 int DMG_saveQual_medit(DMG_pMesh mesh, char *filename);
-
 /**
  * \param mesh pointer toward the mesh structure
  * \param filename name of the .mesh file
@@ -197,7 +197,8 @@ int DMG_saveQual_medit(DMG_pMesh mesh, char *filename);
  */
 int DMG_saveSizeMap_medit(DMG_pMesh mesh, char *filename);
 
-/* Geometric routines */
+
+/* geom_dmg.c */
 /**
  * \param[in] a coordinates of the first point
  * \param[in] b coordinates of the second point
@@ -216,10 +217,8 @@ int DMG_saveSizeMap_medit(DMG_pMesh mesh, char *filename);
  *    = 0 if a, b, c are colinear
  */
 double DMG_orient(const double a[2], const double b[2], const double c[2]);
-
 double DMG_lengthsq(const double a[2], const double b[2]);
 double DMG_length(const double a[2], const double b[2]);
-
 /**
  * \param[in] a coordinates of the first point of the first segment
  * \param[in] b coordinates of the second point of the first segment
@@ -231,7 +230,6 @@ double DMG_length(const double a[2], const double b[2]);
  *
  */
 int DMG_segSegIntersect(const double a[2], const double b[2], const double p[2], const double q[2]);
-
 /**
  * \param[in] a coordinates of the first triangle point
  * \param[in] b coordinates of the second triangle point
@@ -248,7 +246,6 @@ int DMG_segSegIntersect(const double a[2], const double b[2], const double p[2],
  *     + 4 if edge (ca) and (pq) intersect
  */
 int DMG_triaSegIntersect(const double a[2], const double b[2], const double c[2], const double p[2], const double q[2]);
-
 /**
  * \param[in] a coordinates of the first point of the triangle
  * \param[in] b coordinates of the second point of the triangle
@@ -272,7 +269,16 @@ int DMG_triaSegIntersect(const double a[2], const double b[2], const double c[2]
  * the result is the opposite.
  */
 double DMG_inCircle(const double a[2], const double b[2], const double c[2], const double d[2]);
+/**
+ * \param[in] mesh pointer toward the mesh structure
+ * \return DMG_SUCCESS if success, DMG_FAILURE if fail
+ *
+ * Find the triangle containing point c with an exhaustive search.
+ */
+int DMG_computeSizeMap(DMG_pMesh mesh);
 
+
+/* locate_dmg.c */
 /**
  * \param[in] mesh pointer toward the mesh structure
  * \param[in] pt pointer toward the triangle structure
@@ -286,7 +292,6 @@ double DMG_inCircle(const double a[2], const double b[2], const double c[2], con
  * \remark This function is not used in the final code.
  */
 int DMG_baryCoord(DMG_pMesh mesh, DMG_pTria pt, double c[2], double *det, double bc[3]);
-
 /**
  * \param[in] mesh pointer toward the mesh structure
  * \param[in] start index of the starting triangle
@@ -298,7 +303,6 @@ int DMG_baryCoord(DMG_pMesh mesh, DMG_pTria pt, double c[2], double *det, double
  * search among all the triangles (call to DMG_loctria_brute).
  */
 int DMG_locTria(DMG_pMesh mesh, int start, double c[2]);
-
 /**
  * \param[in] mesh pointer toward the mesh structure
  * \param[in] c coordinates of the point to be located
@@ -308,11 +312,9 @@ int DMG_locTria(DMG_pMesh mesh, int start, double c[2]);
  */
 int DMG_locTria_brute(DMG_pMesh mesh, double c[2]);
 
-int DMG_computeSizeMap(DMG_pMesh mesh);
 
-int DMG_chkDelaunay(DMG_pMesh mesh);
-
-/* Ball computation */
+/* ball_dmg.c */
+int DMG_createBall(DMG_pMesh mesh, int ip, int ptcount, const int *ptlist);
 /**
  * \param[in] mesh pointer toward the mesh structure
  * \param[in] it index of the starting triangle
@@ -327,7 +329,8 @@ int DMG_chkDelaunay(DMG_pMesh mesh);
  */
 int DMG_findBall(DMG_pMesh mesh, int it, int iploc, int *list);
 
-/* Quality */
+
+/* quality_dmg.c */
 /**
  * \param[in] mesh pointer toward the mesh structure
  * \param[in] pt pointer toward the triangle structure
@@ -336,7 +339,6 @@ int DMG_findBall(DMG_pMesh mesh, int it, int iploc, int *list);
  * Compute the signed area of triangle pt
  */
 double DMG_computeTriaArea(DMG_pMesh mesh, DMG_pTria pt);
-
 /**
  * \param[in] mesh pointer toward the mesh structure
  * \param[in] pt pointer toward the triangle structure
@@ -348,13 +350,11 @@ double DMG_computeTriaArea(DMG_pMesh mesh, DMG_pTria pt);
  *      l12^2 + l23^2 + l31^2 
  */
 double DMG_computeTriaQual(DMG_pMesh mesh, DMG_pTria pt);
-
 /**
  * \param[in] mesh pointer toward the mesh structure
  * \return the quality of all triangles in the mesh
  */
 int DMG_computeQual(DMG_pMesh mesh);
-
 /**
  * \param[in] mesh pointer toward the mesh structure
  * \param[in] nclass number of classes of the histogram
@@ -364,16 +364,26 @@ int DMG_computeQual(DMG_pMesh mesh);
  */
 int DMG_displayQualHisto(DMG_pMesh mesh, int nclass);
 
-/* Adjacency relations */
+
+/* hash_dmg.c */
 int DMG_hashHedge(DMG_pMesh mesh, DMG_Hedge *htab);
 int DMG_setAdja(DMG_pMesh mesh);
 
-/* Local modifications */
-int DMG_insertPoint(DMG_pMesh mesh, int ip, int start);
-int DMG_createCavity(DMG_pMesh mesh, double d[2], int start, int *ptlist);
-int DMG_createBall(DMG_pMesh mesh, int ip, int ptcount, const int *ptlist);
-int DMG_chkSwap(DMG_pMesh mesh, int it, int k);
 
+/* cavity_dmg.c */
+int DMG_createCavity(DMG_pMesh mesh, double d[2], int start, int *ptlist);
+
+
+/* local_dmg.c */
+/** 
+ * \param[in] mesh pointer toward the mesh structure
+ * \param[in] it index of the triangle
+ * \param[in] k local index of the edge to swap
+ * \return 1 if the swap is legal, else 0
+ *
+ * Check if the swap of edge k (local index) in triangle it is legal.
+ */
+int DMG_chkSwap(DMG_pMesh mesh, int it, int k);
 /**
  * \param[in] mesh pointer toward the mesh structure
  * \param[in] it index of the triangle
@@ -386,15 +396,38 @@ int DMG_chkSwap(DMG_pMesh mesh, int it, int k);
  * after the swap, triangles it and jt are adjacent by their edge number 0.
  */
 int DMG_swap(DMG_pMesh mesh, int it, int k);
+/** 
+ * \param[in] mesh pointer toward the mesh structure
+ * \param[in] it index of the triangle
+ * \param[in] k local index of the edge to swap
+ * \return 1 if the swap is legal, else 0
+ *
+ * Check if the swap of edge k (local index) in triangle it is legal.
+ */
+int DMG_chkCol(DMG_pMesh mesh, int it, int k);
+/**
+ * \param[in] mesh pointer toward the mesh structure
+ * \param[in] it index of the triangle
+ * \param[in] k local index of the edge to swap
+ * \return index jt of the triangle adjacent to it by the swapped edge
+ *
+ * Perform the swap of local edge k of triangle it. Example :
+ * Let us consider it = (q, a, p) and jt = (q, p, b). After the swap,
+ * they become it = (q, a, b) and jt = (p, b, a). Adjacency relationships are updated so that
+ * after the swap, triangles it and jt are adjacent by their edge number 0.
+ */
+int DMG_collapse(DMG_pMesh mesh, int count, int *list);
 
-/* Queue manipulations */
+
+/* queue_dmg.c */
 DMG_Queue* DMG_createQueue();
 void DMG_freeQueue(DMG_Queue *q);
 int DMG_enQueue(DMG_Queue *q, int k);
 int DMG_deQueue(DMG_Queue *q);
 int DMG_qIsEmpty(DMG_Queue *q);
 
-/* Grid manipulations */
+
+/* grid_dmg.c */
 DMG_Grid* DMG_createGrid(double min[2], double max[2], double h);
 void DMG_freeGrid(DMG_Grid *g);
 int DMG_gCell(DMG_Grid *g, double c[2]);

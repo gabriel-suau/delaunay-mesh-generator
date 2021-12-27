@@ -102,7 +102,7 @@ int DMG_newPoint(DMG_pMesh mesh, double c[2]) {
   memcpy(ppt->c, c, 2 * sizeof(double));
   mesh->npu = ppt->tmp;
   ppt->tmp = 0;
-  ppt->tag = DMG_VALIDPOINT;
+  ppt->tag = DMG_VALIDPT;
 
   return ip;
 }
@@ -114,7 +114,7 @@ void DMG_delPoint(DMG_pMesh mesh, int ip) {
   ppt = &mesh->point[ip];
 
   memset(ppt, 0, sizeof(DMG_Point));
-  ppt->tag = DMG_NULPOINT;
+  ppt->tag = DMG_NULPT;
   ppt->tmp = mesh->npu;
 
   mesh->npu = ip;
@@ -208,7 +208,7 @@ int DMG_packPoints(DMG_pMesh mesh) {
       ppt1 = &mesh->point[ip];
       memmove(ppt1, ppt, sizeof(DMG_Point));
       memset(ppt, 0, sizeof(DMG_Point));
-      ppt->tag = DMG_NULPOINT;
+      ppt->tag = DMG_NULPT;
     }
 
     ip++;
@@ -232,7 +232,7 @@ int DMG_packPoints(DMG_pMesh mesh) {
 
 int DMG_packTria(DMG_pMesh mesh) {
   DMG_pTria pt, pt1;
-  int it, k, iadj, iadj1, iadjv, *adja, *adja1, *adjav, voy;
+  int it, k, iadj, iadj1, iadjv, *adja, *adja1, *adjav;
 
   if (!mesh->nt) {
     return DMG_SUCCESS;
@@ -255,8 +255,7 @@ int DMG_packTria(DMG_pMesh mesh) {
         if (!adja1[k]) continue;
         iadjv = 3 * (adja1[k] / 3);
         adjav = &mesh->adja[iadjv];
-        voy = k;
-        adjav[adja1[k]%3] = 3 * it + voy;
+        adjav[adja1[k]%3] = 3 * it + k;
       }
       DMG_delTria(mesh, mesh->nt);
     }

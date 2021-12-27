@@ -1,6 +1,49 @@
 #include "dmg.h"
 
 
+int DMG_createBall(DMG_pMesh mesh, int ip, int ptcount, const int *ptlist) {
+  DMG_pTria pt, pt1;
+  int i, k, ia, ib, it, jt, count, iadj, tlist[DMG_LIST_SIZE];
+
+  count = it = 0;
+
+  assert(ptcount && ptlist != NULL);
+
+  /* Create the triangles and set the adjacency relations between the triangles of the ball 
+     and the triangles adjacent to the cavity */
+  for (k = 0 ; k < ptcount ; k += 3) {
+    ia = ptlist[k];
+    ib = ptlist[k+1];
+    iadj = ptlist[k+2];
+    it = DMG_newTria(mesh);
+    tlist[count++] = it;
+    pt = &mesh->tria[it];
+    pt->v[0] = ip;
+    pt->v[1] = ia;
+    pt->v[2] = ib;
+    mesh->adja[3 * it] = iadj;
+    mesh->adja[iadj] = 3 * it;
+  }
+
+  /* Create the adjacency relations between the triangles of the ball */
+  for (i = 0 ; i < count ; i++) {
+    it = tlist[i];
+    pt = &mesh->tria[it];
+    for (k = 0 ; k < count ; k++) {
+      if (k == i) continue;
+      jt = tlist[k];
+      pt1 = &mesh->tria[jt];
+      if (pt->v[1] == pt1->v[2]) {
+        mesh->adja[3 * it + 2] = 3 * jt + 1;
+        mesh->adja[3 * jt + 1] = 3 * it + 2;
+      }
+    }
+  }
+
+  return it;
+}
+
+
 int DMG_findBall(DMG_pMesh mesh, int start, int iploc, int *list) {
   DMG_Queue *q;
   DMG_pTria pt;
@@ -67,3 +110,4 @@ int DMG_findBall(DMG_pMesh mesh, int start, int iploc, int *list) {
 
   return count;
 }
+

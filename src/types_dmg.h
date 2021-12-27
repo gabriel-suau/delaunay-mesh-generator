@@ -15,8 +15,15 @@
 
 #define DMG_UNSET -1
 
-#define DMG_NULPOINT 10
-#define DMG_VALIDPOINT 11
+#define DMG_NULPT 10
+#define DMG_VALIDPT 11
+#define DMG_BDYPT 12
+
+enum DMG_FieldPointMethod {
+  DMG_FPM_EdgeBased,
+  DMG_FPM_VoronoiVertex,
+  DMG_FPM_VoronoiSegment
+};
 
 enum DMG_Flags {
   DMG_FLAG_NOFLAG = 0,

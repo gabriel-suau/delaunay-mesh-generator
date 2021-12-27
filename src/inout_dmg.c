@@ -72,12 +72,14 @@ int DMG_loadMesh_medit(DMG_pMesh mesh, char *filename) {
   if (mesh->dim == 2) {
     for (i = 1 ; i <= mesh->np ; i++) {
       ppt = &mesh->point[i];
+      ppt->tag = DMG_BDYPT;
       fscanf(file, "%lf %lf %d", &ppt->c[0], &ppt->c[1], &ppt->ref);
     }
   } else if (mesh->dim == 3) {
     mesh->dim = 2;
     for (i = 1 ; i <= mesh->np ; i++) {
       ppt = &mesh->point[i];
+      ppt->tag = DMG_BDYPT;
       fscanf(file, "%lf %lf %lf %d", &ppt->c[0], &ppt->c[1], &dummy, &ppt->ref); 
     }
   }
