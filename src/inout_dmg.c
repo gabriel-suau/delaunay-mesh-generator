@@ -22,6 +22,8 @@ int DMG_loadMesh_medit(DMG_pMesh mesh, char *filename) {
     return DMG_FAILURE;    
   }
 
+  printf("## File %s opened\n", filename);
+
   /* Scan a first time to get the nb of entities */
   while(fscanf(file, "%s", chain) != EOF && strncmp(chain, "End", strlen("End"))){
 
@@ -107,10 +109,12 @@ int DMG_loadMesh_medit(DMG_pMesh mesh, char *filename) {
 
   fclose(file);
 
-  /* Print the nmber of entities */
-  fprintf(stdout, "%d/%d (first unused: %d) vertices \n", mesh->np, mesh->npmax, mesh->npu);
-  fprintf(stdout, "%d/%d (first unused: %d) edges \n", mesh->na, mesh->namax, mesh->nau);
-  fprintf(stdout, "%d/%d (first unused: %d) triangles \n", mesh->nt, mesh->ntmax, mesh->ntu);
+  /* Print the number of entities */
+  fprintf(stdout, "%d/%d vertices \n", mesh->np, mesh->npmax);
+  fprintf(stdout, "%d/%d edges \n", mesh->na, mesh->namax);
+  fprintf(stdout, "%d/%d triangles \n", mesh->nt, mesh->ntmax);
+
+  printf("## File %s closed\n", filename);
 
   return DMG_SUCCESS;  
 }
@@ -138,6 +142,8 @@ int DMG_saveMesh_medit(DMG_pMesh mesh, char *filename) {
     fprintf(stderr, "Error: %s: can't open %s \n", __func__, filename);
     return DMG_FAILURE;
   }
+
+  printf("## File %s opened\n", filename);
 
   np = nt = 0;
 
@@ -196,6 +202,13 @@ int DMG_saveMesh_medit(DMG_pMesh mesh, char *filename) {
 
   fclose(file);
 
+  /* Print the number of entities */
+  fprintf(stdout, "%d/%d vertices \n", np, mesh->npmax);
+  fprintf(stdout, "%d/%d edges \n", mesh->na, mesh->namax);
+  fprintf(stdout, "%d/%d triangles \n", nt, mesh->ntmax);
+
+  printf("## File %s closed\n", filename);
+
   return DMG_SUCCESS;
 }
 
@@ -222,6 +235,8 @@ int DMG_saveMeshAs3D_medit(DMG_pMesh mesh, char *filename) {
     fprintf(stderr, "Error: %s: can't open %s \n", __func__, filename);
     return DMG_FAILURE;
   }
+
+  printf("## File %s opened\n", filename);
 
   np = nt = 0;
 
@@ -279,6 +294,13 @@ int DMG_saveMeshAs3D_medit(DMG_pMesh mesh, char *filename) {
   fprintf(file, "%s", chain);
 
   fclose(file);
+
+  /* Print the number of entities */
+  fprintf(stdout, "%d/%d vertices \n", np, mesh->npmax);
+  fprintf(stdout, "%d/%d edges \n", mesh->na, mesh->namax);
+  fprintf(stdout, "%d/%d triangles \n", nt, mesh->ntmax);
+
+  printf("## File %s closed\n", filename);
 
   return DMG_SUCCESS;
 }
