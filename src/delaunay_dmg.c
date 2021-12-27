@@ -369,12 +369,15 @@ int DMG_refineDelaunay(DMG_pMesh mesh) {
   DMG_pTria pt;
   DMG_pPoint ppta, pptb;
   DMG_Hedge *htab, *hedge;
+  DMG_Grid *g;
   int it, jt, j, k, a, b, c, vmin, vmax, key, hsize, n, ptcount;
   double *ca, *cb, nab[2], cc[2], d, r, alpha;
 
   htab = (DMG_Hedge*) calloc(3 * (mesh->ntmax + 1), sizeof(DMG_Hedge));
 
   DMG_computeSizeMap(mesh);
+
+  g = DMG_createGrid(mesh->min, mesh->max, mesh->hmin);
 
   /* Cut the edges until all are saturated */
   do {
@@ -444,14 +447,25 @@ int DMG_refineDelaunay(DMG_pMesh mesh) {
 
     } /* for it <= mesh->nt */
 
-    /* TODO: Filter out points using a background grid */
+    /* Filter out points using the background grid */
     for (k = mesh->np - ptcount + 1; k <= mesh->np ; k++) {
-      jt = DMG_insertPoint(mesh, k, jt);
+      ppta = &mesh->point[k];
+      it = DMG_gCell(g, ppta->c);
+      if (!g->ucell[it]) {
+        jt = DMG_insertPoint(mesh, k, jt);
+        g->ucell[it] = 1;
+      }
+      else {
+        /* DMG_delPoint(mesh, k); */
+        ptcount--;
+      }
     }
 
     memset(htab, 0, 3 * (mesh->ntmax + 1) * sizeof(DMG_Hedge));
 
   } while (ptcount);
+
+  DMG_freeGrid(g);
 
   free(htab); htab = NULL;
 

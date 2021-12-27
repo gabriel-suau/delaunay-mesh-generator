@@ -8,8 +8,8 @@ DMG_Grid *DMG_createGrid(double min[2], double max[2], double h) {
   g->h = h;
   g->xmin = min[0];
   g->ymin = min[1];
-  g->nx = (int)(max[0] - min[0]) / h;
-  g->ny = (int)(max[1] - min[1]) / h;
+  g->nx = (int)((max[0] - min[0]) / h);
+  g->ny = (int)((max[1] - min[1]) / h);
   g->ucell = (int*)calloc(g->nx * g->ny, sizeof(int));
 
   return g;
@@ -27,8 +27,8 @@ void DMG_freeGrid(DMG_Grid *g) {
 int DMG_gCell(DMG_Grid *g, double c[2]) {
   int i, j;
 
-  j = (int)(c[0] / g->h);
-  i = (int)(c[1] / g->h);
+  j = (int)((c[0] - g->xmin) / g->h);
+  i = (int)((c[1] - g->ymin) / g->h);
 
   return i * g->nx + j;
 }
