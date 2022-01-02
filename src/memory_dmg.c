@@ -25,29 +25,27 @@ int DMG_Free_mesh(DMG_pMesh mesh) {
     return DMG_SUCCESS;
   }
 
-  if (mesh != NULL) {
-    if (mesh->point) {
-      free(mesh->point);
-      mesh->point = NULL;
-      mesh->np = 0;
-    }
-    if (mesh->edge) {
-      free(mesh->edge);
-      mesh->edge = NULL;
-      mesh->na = 0;
-    }
-    if (mesh->tria) {
-      free(mesh->tria);
-      mesh->edge = NULL;
-      mesh->nt = 0;
-    }
-    if (mesh->adja) {
-      free(mesh->adja);
-      mesh->adja = NULL;
-    }
-    free(mesh);
-    mesh = NULL;    
+  if (mesh->point) {
+    free(mesh->point);
+    mesh->point = NULL;
+    mesh->np = 0;
   }
+  if (mesh->edge) {
+    free(mesh->edge);
+    mesh->edge = NULL;
+    mesh->na = 0;
+  }
+  if (mesh->tria) {
+    free(mesh->tria);
+    mesh->edge = NULL;
+    mesh->nt = 0;
+  }
+  if (mesh->adja) {
+    free(mesh->adja);
+    mesh->adja = NULL;
+  }
+  free(mesh);
+  mesh = NULL;
 
   return DMG_SUCCESS;
 }
