@@ -1,0 +1,9 @@
+#ifndef DMGVERSION_H
+#define DMGVERSION_H
+
+#define DMG_VERSION_MAJOR 1
+#define DMG_VERSION_MINOR 0
+#define DMG_VERSION_PATCH 0
+#define DMG_RELEASE_DATE "Jan. 02, 2022"
+
+#endif

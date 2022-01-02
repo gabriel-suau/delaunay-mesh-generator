@@ -14,8 +14,6 @@ option(DMG_DOC "Build the doxygen documentation" OFF)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(DMG_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
 
-configure_file(${DMG_SOURCE_DIR}/dmgversion.h.in ${PROJECT_BINARY_DIR}/dmgversion.h)
-
 # include files
 include_directories(${DMG_SOURCE_DIR})
 
