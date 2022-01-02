@@ -33,10 +33,11 @@ Here is a small checklist of the implemented features and the features that stil
 - [x] Insert the boundary points using the Bowyer-Watson algorithm,
 - [x] Enforce the boundary edges,
 - [x] Mark the subdomains and delete the bounding box,
-- [ ] Refine the mesh by inserting volume points in order to achieve a desired edge length.
+- [x] Refine the mesh by inserting volume points in order to achieve a desired edge length.
+- [ ] Optimizations (edge swaps, collapses and node relocation)
 
 ## Documentation
-A Doxygen documentation will be included in a future release.
+A Doxygen documentation can be built by enabling the `DMG_DOC` option when configuring the project.
 
 ## Credits
 All credits go to Gabriel Suau and Lucas Trautmann.
