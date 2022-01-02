@@ -5,6 +5,7 @@ enable_language(C)
 set(DMG_VERSION_MAJOR "1")
 set(DMG_VERSION_MINOR "0")
 set(DMG_VERSION_PATCH "0")
+set(DMG_RELEASE_DATE "Jan. 02, 2022")
 set(DMG_VERSION "${DMG_VERSION_MAJOR}.${DMG_VERSION_MINOR}.${DMG_VERSION_PATCH}")
 
 option(DMG_DOC "Build the doxygen documentation" OFF)
@@ -12,6 +13,8 @@ option(DMG_DOC "Build the doxygen documentation" OFF)
 # set the main cmake compilation variables
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(DMG_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
+
+configure_file(${DMG_SOURCE_DIR}/dmgversion.h.in ${PROJECT_BINARY_DIR}/dmgversion.h)
 
 # include files
 include_directories(${DMG_SOURCE_DIR})

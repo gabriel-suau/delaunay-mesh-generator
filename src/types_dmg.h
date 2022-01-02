@@ -9,6 +9,8 @@
 #include <stdint.h>
 #include <math.h>
 
+#include "dmgversion.h"
+
 #define DMG_FAILURE 1
 
 #define DMG_SUCCESS 0
