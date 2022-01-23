@@ -36,6 +36,17 @@ Here is a small checklist of the implemented features and the features that stil
 - [x] Refine the mesh by inserting volume points in order to achieve a desired edge length.
 - [ ] Optimizations (edge swaps, collapses and node relocation)
 
+## Tests
+You can find some examples of input boundary meshes in the <code>meshes/input</code> directory. To launch the tests, just type
+```shell
+make test
+```
+or 
+```shell
+ctest
+```
+The output meshes and solution files are written in the <code>meshes/output</code> directory.
+
 ## Documentation
 A Doxygen documentation can be built by enabling the `DMG_DOC` option when configuring the project.
 
