@@ -49,20 +49,48 @@ int DMG_initDelaunay(DMG_pMesh mesh) {
   c[1] = mesh->min[1] - 0.1 * delta[1];
   ip1 = DMG_newPoint(mesh, c);
 
+  if (!ip1){
+    DMG_POINT_REALLOC(mesh, ip1, DMG_REALLOC_MULT,
+                      fprintf(stderr, " ## Error: %s: unable to"
+                              " allocate a new point\n", __func__);
+                      return DMG_FAILURE, c);
+  }
+
   /* Bottom right corner */
   c[0] = mesh->max[0] + 0.1 * delta[0];
   c[1] = mesh->min[1] - 0.1 * delta[1];
   ip2 = DMG_newPoint(mesh, c);
+
+  if (!ip2){
+    DMG_POINT_REALLOC(mesh, ip2, DMG_REALLOC_MULT,
+                      fprintf(stderr, " ## Error: %s: unable to"
+                              " allocate a new point\n", __func__);
+                      return DMG_FAILURE, c);
+  }
 
   /* Top left corner */
   c[0] = mesh->min[0] - 0.1 * delta[0];
   c[1] = mesh->max[1] + 0.1 * delta[1];
   ip3 = DMG_newPoint(mesh, c);
 
+  if (!ip3){
+    DMG_POINT_REALLOC(mesh, ip3, DMG_REALLOC_MULT,
+                      fprintf(stderr, " ## Error: %s: unable to"
+                              " allocate a new point\n", __func__);
+                      return DMG_FAILURE, c);
+  }
+
   /* Top right corner */
   c[0] = mesh->max[0] + 0.1 * delta[0];
   c[1] = mesh->max[1] + 0.1 * delta[1];
   ip4 = DMG_newPoint(mesh, c);
+
+  if (!ip4){
+    DMG_POINT_REALLOC(mesh, ip4, DMG_REALLOC_MULT,
+                      fprintf(stderr, " ## Error: %s: unable to"
+                              " allocate a new point\n", __func__);
+                      return DMG_FAILURE, c);
+  }
 
   assert ( ip1 == mesh->np-3 );
   assert ( ip2 == mesh->np-2 );
@@ -205,8 +233,14 @@ int DMG_refineDelaunay(DMG_pMesh mesh) {
               alpha += r;
               cc[0] = cc[0] + alpha * nab[0];
               cc[1] = cc[1] + alpha * nab[1];
-              c = DMG_newPoint(mesh, cc);
-              mesh->point[c].h = alpha;
+              ip = DMG_newPoint(mesh, cc);
+              if (!ip) {
+                DMG_POINT_REALLOC(mesh, ip, DMG_REALLOC_MULT,
+                                  fprintf(stderr, " ## Error: %s: unable to"
+                                          " allocate a new point\n", __func__);
+                                  return DMG_FAILURE, cc);
+              }
+              mesh->point[ip].h = alpha;
             }
 
             ptcount += n;

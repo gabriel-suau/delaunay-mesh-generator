@@ -10,7 +10,7 @@
 #define DMG_NPMAX 10000
 #define DMG_NTMAX 20000
 
-#define DMG_REALLOC_MULT 1.5
+#define DMG_REALLOC_MULT 2
 
 #define DMG_LIST_SIZE 256
 
@@ -28,6 +28,51 @@
 /* Useful to avoid modulos when going through the vertices/edges of a triangle */
 static const int DMG_tria_vert[5] = {0, 1, 2, 0, 1};
 
+/* Reallocate an array */
+#define DMG_TAB_RECALLOC(ptr,initSize,mult,type,message,law) do         \
+    {                                                                   \
+      type* tmp = NULL;                                                 \
+      size_t newsize = (size_t)((initSize) * mult);                     \
+                                                                        \
+      tmp = (type*)realloc((ptr), (newsize) * sizeof(type));            \
+      if (!tmp) {                                                       \
+        free(tmp);                                                      \
+        fprintf(stderr, "Unable to allocate %s.\n",message);            \
+        law;                                                            \
+      }                                                                 \
+      else {                                                            \
+        ptr = tmp;                                                      \
+        assert(ptr);                                                    \
+        if ((newsize) > (initSize))                                     \
+          memset(&ptr[initSize],0,((newsize) - (initSize))*sizeof(type)); \
+      }                                                                 \
+    } while(0);                                                         \
+
+/* Reallocate the point array */
+#define DMG_POINT_REALLOC(mesh,ip,mult,law,coord) do                    \
+    {                                                                   \
+      int elink;                                                        \
+      assert( mesh && mesh->point);                                     \
+      DMG_TAB_RECALLOC(mesh->point,mesh->npmax+1,mult,                  \
+                       DMG_Point, "larger point table", law);           \
+                                                                        \
+      mesh->npmax = mesh->npmax * mult + 1;                             \
+      mesh->npu = mesh->np+1;                                           \
+      for (elink = mesh->npu ; elink < mesh->npmax ; elink++)           \
+        mesh->point[elink].tmp  = elink + 1;                            \
+                                                                        \
+      /* We try again to add the point */                               \
+      ip = DMG_newPoint(mesh,coord);                                    \
+      if ( !ip ) {law;}                                                 \
+    } while(0);                                                         \
+
+/* Reallocate the tria array */
+#define DMG_TRIA_REALLOC(mesh,it,mult,law) do                           \
+    {                                                                   \
+      assert( mesh && mesh->tria);                                      \
+      DMG_TAB_RECALLOC(mesh,mesh->tria,mesh->ntmax+1,mult,              \
+                       "larger point table", DMG_Tetra,law);            \
+    } while(0);                                                         \
 
 /* memory_dmg.c */
 /**
