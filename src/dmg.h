@@ -46,7 +46,7 @@ static const int DMG_tria_vert[5] = {0, 1, 2, 0, 1};
         if ((newsize) > (initSize))                                     \
           memset(&ptr[initSize],0,((newsize) - (initSize))*sizeof(type)); \
       }                                                                 \
-    } while(0);                                                         \
+    } while(0);
 
 /* Reallocate the point array */
 #define DMG_POINT_REALLOC(mesh,ip,mult,law,coord) do                    \
@@ -57,22 +57,38 @@ static const int DMG_tria_vert[5] = {0, 1, 2, 0, 1};
                        DMG_Point, "larger point table", law);           \
                                                                         \
       mesh->npmax = mesh->npmax * mult + 1;                             \
-      mesh->npu = mesh->np+1;                                           \
+      mesh->npu = mesh->np + 1;                                         \
       for (elink = mesh->npu ; elink < mesh->npmax ; elink++)           \
         mesh->point[elink].tmp  = elink + 1;                            \
                                                                         \
       /* We try again to add the point */                               \
       ip = DMG_newPoint(mesh,coord);                                    \
       if ( !ip ) {law;}                                                 \
-    } while(0);                                                         \
+    } while(0);
 
 /* Reallocate the tria array */
 #define DMG_TRIA_REALLOC(mesh,it,mult,law) do                           \
     {                                                                   \
+      int elink, oldsize;                                               \
+                                                                        \
+      oldsize = mesh->ntmax + 1;                                        \
       assert( mesh && mesh->tria);                                      \
-      DMG_TAB_RECALLOC(mesh,mesh->tria,mesh->ntmax+1,mult,              \
-                       "larger point table", DMG_Tetra,law);            \
-    } while(0);                                                         \
+      DMG_TAB_RECALLOC(mesh->tria,mesh->ntmax+1,mult,                   \
+                       DMG_Tria, "larger tria table",law);              \
+                                                                        \
+      mesh->ntmax = mesh->ntmax * mult + 1;                             \
+      mesh->ntu = mesh->nt + 1;                                         \
+      for (elink = mesh->ntu ; elink < mesh->ntmax ; elink++)           \
+          mesh->tria[elink].v[2] = elink + 1;                           \
+                                                                        \
+      if (mesh->adja) {                                                 \
+        DMG_TAB_RECALLOC(mesh->adja,3*oldsize,mult,                     \
+                         int, "larger adja table", law);                \
+      }                                                                 \
+                                                                        \
+      it = DMG_newTria(mesh);                                           \
+      if ( !it ) {law;}                                                 \
+    } while(0);
 
 /* memory_dmg.c */
 /**

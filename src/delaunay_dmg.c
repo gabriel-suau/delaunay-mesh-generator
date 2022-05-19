@@ -84,7 +84,6 @@ int DMG_initDelaunay(DMG_pMesh mesh) {
   c[0] = mesh->max[0] + 0.1 * delta[0];
   c[1] = mesh->max[1] + 0.1 * delta[1];
   ip4 = DMG_newPoint(mesh, c);
-
   if (!ip4){
     DMG_POINT_REALLOC(mesh, ip4, DMG_REALLOC_MULT,
                       fprintf(stderr, " ## Error: %s: unable to"
@@ -102,12 +101,24 @@ int DMG_initDelaunay(DMG_pMesh mesh) {
 
   /* Create the 2 first triangles */
   it1 = DMG_newTria(mesh);
+  if ( !it1 ) {
+    DMG_TRIA_REALLOC(mesh, it1, DMG_REALLOC_MULT,
+                       fprintf(stderr,"\n  ## Error: %s: unable to allocate a"
+                               " new element.\n",__func__);
+                       return 0);
+  }
   pt = &mesh->tria[it1];
   pt->v[0] = ip1;
   pt->v[1] = ip4;
   pt->v[2] = ip3;
 
   it2 = DMG_newTria(mesh);
+  if ( !it2 ) {
+    DMG_TRIA_REALLOC(mesh, it2, DMG_REALLOC_MULT,
+                       fprintf(stderr,"\n  ## Error: %s: unable to allocate a"
+                               " new element.\n",__func__);
+                       return 0);
+  }
   pt = &mesh->tria[it2];
   pt->v[0] = ip1;
   pt->v[1] = ip2;
@@ -372,7 +383,17 @@ int DMG_refineDelaunay(DMG_pMesh mesh) {
       g->ucell[it] = k;
     }
 
-    memset(htab, 0, 3 * (mesh->ntmax + 1) * sizeof(DMG_Hedge));
+    tmp = (DMG_Hedge*) realloc(htab, 3 * (mesh->ntmax + 1) * sizeof(DMG_Hedge));
+    if (!tmp) {
+      free(tmp);
+      fprintf(stderr, "Unable to allocate larger hash table.\n");
+      return DMG_FAILURE;
+    }
+    else {
+      htab = tmp;
+      assert(htab);
+      memset(htab, 0, 3 * (mesh->ntmax + 1) * sizeof(DMG_Hedge)); 
+    }
 
   } while (ptcount);
 

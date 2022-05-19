@@ -16,6 +16,14 @@ int DMG_createBall(DMG_pMesh mesh, int ip, int ptcount, const int *ptlist) {
     ib = ptlist[k+1];
     iadj = ptlist[k+2];
     it = DMG_newTria(mesh);
+
+    if ( !it ) {
+    DMG_TRIA_REALLOC(mesh, it, DMG_REALLOC_MULT,
+                       fprintf(stderr,"\n  ## Error: %s: unable to allocate a"
+                               " new element.\n",__func__);
+                       return 0);
+    }
+
     tlist[count++] = it;
     pt = &mesh->tria[it];
     pt->v[0] = ip;
