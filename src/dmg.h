@@ -412,7 +412,18 @@ int DMG_locTria_brute(DMG_pMesh mesh, double c[2]);
 /**************************************************
  * ball_dmg.c
  **************************************************/
+/**
+ * \param[in] mesh pointer toward the mesh structure
+ * \param[in] ip index of the point whose ball is to be created
+ * \param[in] ptcount number of points/edges on the cavity boundary
+ * \param[in] ptlist list of the indices of the points on the cavity boundary
+ * \return index of the last created triangle of the newly created ball.
+ *
+ * Create the ball of point ip given its cavity boundary.
+ *
+ */
 int DMG_createBall(DMG_pMesh mesh, int ip, int ptcount, const int *ptlist);
+
 /**
  * \param[in] mesh pointer toward the mesh structure
  * \param[in] it index of the starting triangle
@@ -471,13 +482,39 @@ int DMG_displayQualHisto(DMG_pMesh mesh, int nclass);
 /**************************************************
  * hash_dmg.c
  **************************************************/
+/**
+ * \param[in] mesh pointer toward the mesh structure
+ * \param[out] htab hash table of the edge indices
+ * \return DMG_SUCCESS if OK, DMG_FAILURE if the mesh is empty or if htab is not allocated.
+ *
+ * Hash the (internal and boundary) edges of the mesh.
+ */
 int DMG_hashHedge(DMG_pMesh mesh, DMG_Hedge *htab);
+
+/**
+ * \param[in] mesh pointer toward the mesh structure
+ * \return DMG_SUCCESS if OK, DMG_FAILURE if the mesh is empty or if mesh->adja is not allocated.
+ *
+ * Compute the adjacency relations and fill the adjacendy table of the mesh.
+ */
 int DMG_setAdja(DMG_pMesh mesh);
 
 
 /**************************************************
  * cavity_dmg.c
  **************************************************/
+/**
+ * \param[in] mesh pointer toward the mesh structure
+ * \param[in] d coordinates of the point
+ * \param[in] start index of the triangle containing the point
+ * \param[out] ptlist list of the 
+ * \return size of the list ptlist (= 3 * nb of edges/vertices on the cavity boundary)
+ *
+ * Create the cavity of point of coordinates d using the delaunay criterion. All triangles
+ * in the cavity are deleted. When this function returns, ptlist contains "triplets" of
+ * the form (v1_index, v2_index, adja) for each edge of the cavity boundary, where adja is
+ * the adjacency relationship of the cavity with the triangle on the other side of the edge.
+ */
 int DMG_createCavity(DMG_pMesh mesh, double d[2], int start, int *ptlist);
 
 
@@ -507,27 +544,7 @@ int DMG_chkSwap(DMG_pMesh mesh, int it, int k);
  */
 int DMG_swap(DMG_pMesh mesh, int it, int k);
 
-/** 
- * \param[in] mesh pointer toward the mesh structure
- * \param[in] it index of the triangle
- * \param[in] k local index of the edge to swap
- * \return 1 if the swap is legal, else 0
- *
- * Check if the swap of edge k (local index) in triangle it is legal.
- */
-int DMG_chkCol(DMG_pMesh mesh, int it, int k);
-
-/**
- * \param[in] mesh pointer toward the mesh structure
- * \param[in] it index of the triangle
- * \param[in] k local index of the edge to swap
- * \return index jt of the triangle adjacent to it by the swapped edge
- *
- * Perform the swap of local edge k of triangle it. Example :
- * Let us consider it = (q, a, p) and jt = (q, p, b). After the swap,
- * they become it = (q, a, b) and jt = (p, b, a). Adjacency relationships are updated so that
- * after the swap, triangles it and jt are adjacent by their edge number 0.
- */
+int DMG_chkCol(DMG_pMesh mesh, int count, int *list);
 int DMG_collapse(DMG_pMesh mesh, int count, int *list);
 
 
