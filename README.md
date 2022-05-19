@@ -1,4 +1,4 @@
-# delaunay-mesh-generator
+# DMG
 
 Implementation of a 2D simplicial mesh generator using the constrained Delaunay algorithm. DMG takes a 2D boundary mesh as input, and outputs a 2D simplicial volume mesh.
 
@@ -37,7 +37,7 @@ Here is a small checklist of the implemented features and the features that stil
 - [ ] Optimizations (edge swaps, collapses and node relocation)
 
 ## Tests
-You can find some examples of input boundary meshes in the <code>meshes/input</code> directory. To launch the tests, just type
+You can find some examples of input boundary meshes in the <code>meshes/input</code> directory. To launch the tests, enable the <code>BUILD_TESTING</code> option when configuring with Cmake, build <code>DMG</code> with <code>make</code>, and type
 ```shell
 make test
 ```
@@ -48,7 +48,7 @@ ctest
 The output meshes and solution files are written in the <code>meshes/output</code> directory.
 
 ## Documentation
-A Doxygen documentation can be built by enabling the `DMG_DOC` option when configuring the project.
+A Doxygen documentation can be built by enabling the `DMG_DOC` option when configuring the project (no, that is a lie, the documentation is not available yet).
 
 ## Credits
 All credits go to Gabriel Suau and Lucas Trautmann.
