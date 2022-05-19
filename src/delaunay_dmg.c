@@ -264,115 +264,112 @@ int DMG_refineDelaunay(DMG_pMesh mesh) {
         continue;
       }
 
-      else {
-
-        if (it + 1 < gsize) {
-          ip = g->ucell[it + 1];
-          if (ip) {
-            pptb = &mesh->point[ip];
-            hmin = MAX2(ppta->h, pptb->h);
-            if (DMG_lengthsq(ppta->c, pptb->c) < hmin * hmin) {
-              ppta->tag = DMG_NULPT;
-              ptcount--;
-              continue;
-            }
+      if (it + 1 < gsize) {
+        ip = g->ucell[it + 1];
+        if (ip) {
+          pptb = &mesh->point[ip];
+          hmin = MAX2(ppta->h, pptb->h);
+          if (DMG_lengthsq(ppta->c, pptb->c) < hmin * hmin) {
+            ppta->tag = DMG_NULPT;
+            ptcount--;
+            continue;
           }
         }
-
-        if (it - 1 >= 0) {
-          ip = g->ucell[it - 1];
-          if (ip) {
-            pptb = &mesh->point[ip];
-            hmin = MAX2(ppta->h, pptb->h);
-            if (DMG_lengthsq(ppta->c, pptb->c) < hmin * hmin) {
-              ppta->tag = DMG_NULPT;
-              ptcount--;
-              continue;
-            }
-          }
-        }
-
-        if (it + g->nx < gsize) {
-          ip = g->ucell[it + g->nx];
-          if (ip) {
-            pptb = &mesh->point[ip];
-            hmin = MAX2(ppta->h, pptb->h);
-            if (DMG_lengthsq(ppta->c, pptb->c) < hmin * hmin) {
-              ppta->tag = DMG_NULPT;
-              ptcount--;
-              continue;
-            }
-          }
-        }
-
-        if (it + g->nx + 1 < gsize) {
-          ip = g->ucell[it + g->nx + 1];
-          if (ip) {
-            pptb = &mesh->point[ip];
-            hmin = MAX2(ppta->h, pptb->h);
-            if (DMG_lengthsq(ppta->c, pptb->c) < hmin * hmin) {
-              ppta->tag = DMG_NULPT;
-              ptcount--;
-              continue;
-            }
-          }
-        }
-
-        if (it + g->nx - 1 < gsize) {
-          ip = g->ucell[it + g->nx - 1];
-          if (ip) {
-            pptb = &mesh->point[ip];
-            hmin = MAX2(ppta->h, pptb->h);
-            if (DMG_lengthsq(ppta->c, pptb->c) < hmin * hmin) {
-              ppta->tag = DMG_NULPT;
-              ptcount--;
-              continue;
-            }
-          }
-        }
-
-        if (it - g->nx >= 0) {
-          ip = g->ucell[it - g->nx];
-          if (ip) {
-            pptb = &mesh->point[ip];
-            hmin = MAX2(ppta->h, pptb->h);
-            if (DMG_lengthsq(ppta->c, pptb->c) < hmin * hmin) {
-              ppta->tag = DMG_NULPT;
-              ptcount--;
-              continue;
-            }
-          }
-        }
-
-        if (it - g->nx + 1 >= 0) {
-          ip = g->ucell[it - g->nx + 1];
-          if (ip) {
-            pptb = &mesh->point[ip];
-            hmin = MAX2(ppta->h, pptb->h);
-            if (DMG_lengthsq(ppta->c, pptb->c) < hmin * hmin) {
-              ppta->tag = DMG_NULPT;
-              ptcount--;
-              continue;
-            }
-          }
-        }
-
-        if (it - g->nx - 1 >= 0) {
-          ip = g->ucell[it - g->nx - 1];
-          if (ip) {
-            pptb = &mesh->point[ip];
-            hmin = MAX2(ppta->h, pptb->h);
-            if (DMG_lengthsq(ppta->c, pptb->c) < hmin * hmin) {
-              ppta->tag = DMG_NULPT;
-              ptcount--;
-              continue;
-            }
-          }
-        }
-
-        jt = DMG_insertPoint(mesh, k, jt);
-        g->ucell[it] = k;
       }
+
+      if (it - 1 >= 0) {
+        ip = g->ucell[it - 1];
+        if (ip) {
+          pptb = &mesh->point[ip];
+          hmin = MAX2(ppta->h, pptb->h);
+          if (DMG_lengthsq(ppta->c, pptb->c) < hmin * hmin) {
+            ppta->tag = DMG_NULPT;
+            ptcount--;
+            continue;
+          }
+        }
+      }
+
+      if (it + g->nx < gsize) {
+        ip = g->ucell[it + g->nx];
+        if (ip) {
+          pptb = &mesh->point[ip];
+          hmin = MAX2(ppta->h, pptb->h);
+          if (DMG_lengthsq(ppta->c, pptb->c) < hmin * hmin) {
+            ppta->tag = DMG_NULPT;
+            ptcount--;
+            continue;
+          }
+        }
+      }
+
+      if (it + g->nx + 1 < gsize) {
+        ip = g->ucell[it + g->nx + 1];
+        if (ip) {
+          pptb = &mesh->point[ip];
+          hmin = MAX2(ppta->h, pptb->h);
+          if (DMG_lengthsq(ppta->c, pptb->c) < hmin * hmin) {
+            ppta->tag = DMG_NULPT;
+            ptcount--;
+            continue;
+          }
+        }
+      }
+
+      if (it + g->nx - 1 < gsize) {
+        ip = g->ucell[it + g->nx - 1];
+        if (ip) {
+          pptb = &mesh->point[ip];
+          hmin = MAX2(ppta->h, pptb->h);
+          if (DMG_lengthsq(ppta->c, pptb->c) < hmin * hmin) {
+            ppta->tag = DMG_NULPT;
+            ptcount--;
+            continue;
+          }
+        }
+      }
+
+      if (it - g->nx >= 0) {
+        ip = g->ucell[it - g->nx];
+        if (ip) {
+          pptb = &mesh->point[ip];
+          hmin = MAX2(ppta->h, pptb->h);
+          if (DMG_lengthsq(ppta->c, pptb->c) < hmin * hmin) {
+            ppta->tag = DMG_NULPT;
+            ptcount--;
+            continue;
+          }
+        }
+      }
+
+      if (it - g->nx + 1 >= 0) {
+        ip = g->ucell[it - g->nx + 1];
+        if (ip) {
+          pptb = &mesh->point[ip];
+          hmin = MAX2(ppta->h, pptb->h);
+          if (DMG_lengthsq(ppta->c, pptb->c) < hmin * hmin) {
+            ppta->tag = DMG_NULPT;
+            ptcount--;
+            continue;
+          }
+        }
+      }
+
+      if (it - g->nx - 1 >= 0) {
+        ip = g->ucell[it - g->nx - 1];
+        if (ip) {
+          pptb = &mesh->point[ip];
+          hmin = MAX2(ppta->h, pptb->h);
+          if (DMG_lengthsq(ppta->c, pptb->c) < hmin * hmin) {
+            ppta->tag = DMG_NULPT;
+            ptcount--;
+            continue;
+          }
+        }
+      }
+
+      jt = DMG_insertPoint(mesh, k, jt);
+      g->ucell[it] = k;
     }
 
     memset(htab, 0, 3 * (mesh->ntmax + 1) * sizeof(DMG_Hedge));
