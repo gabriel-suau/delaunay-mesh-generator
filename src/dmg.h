@@ -32,7 +32,7 @@ static const int DMG_tria_vert[5] = {0, 1, 2, 0, 1};
 #define DMG_TAB_RECALLOC(ptr,initSize,mult,type,message,law) do         \
     {                                                                   \
       type* tmp = NULL;                                                 \
-      size_t newsize = (size_t)((initSize) * mult);                     \
+      size_t newsize = (size_t)((initSize) * mult);             \
                                                                         \
       tmp = (type*)realloc((ptr), (newsize) * sizeof(type));            \
       if (!tmp) {                                                       \
@@ -43,7 +43,7 @@ static const int DMG_tria_vert[5] = {0, 1, 2, 0, 1};
       else {                                                            \
         ptr = tmp;                                                      \
         assert(ptr);                                                    \
-        if ((newsize) > (initSize))                                     \
+        if ((newsize) > (size_t)(initSize))                             \
           memset(&ptr[initSize],0,((newsize) - (initSize))*sizeof(type)); \
       }                                                                 \
     } while(0);
