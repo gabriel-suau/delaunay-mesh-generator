@@ -20,6 +20,8 @@ include_directories(${DMG_SOURCE_DIR})
 # glob source files into one variable
 file(GLOB DMG_SOURCE_FILES ${DMG_SOURCE_DIR}/*.c)
 
+add_compile_options(-Wall -Wextra)
+
 # include the math library
 find_library(M_LIB m)
 set(LIBRARIES ${M_LIB} ${LIBRARIES})
