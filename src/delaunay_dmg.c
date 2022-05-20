@@ -197,7 +197,7 @@ int DMG_laplacianSmoothing(DMG_pMesh mesh) {
       ppt = &mesh->point[pt->v[iploc]];
 
       // Do not move the already moved vertices
-      // and the boundary vertices
+      // or the boundary vertices
       if (!DMG_VOK(ppt) || ppt->flag == 1
           || ppt->tag == DMG_BDYPT) continue;
 
@@ -216,9 +216,11 @@ int DMG_laplacianSmoothing(DMG_pMesh mesh) {
         c[1] += ppt1->c[1];
       }
 
+#warning TODO: need to check positivity of new triangles before updating the coordinates.
+
       c[0] /= ptcount;
       c[1] /= ptcount;
-      double w = 0.95;
+      double w = 0.5;
       ppt->c[0] = w * c[0] + (1 - w) * ppt->c[0];
       ppt->c[1] = w * c[1] + (1 - w) * ppt->c[1];
     }
@@ -258,6 +260,8 @@ int DMG_refineDelaunay(DMG_pMesh mesh) {
 
   g = DMG_createGrid(mesh->min, mesh->max, mesh->hmin);
   gsize = g->nx * g->ny;
+
+  jt = mesh->nt;
 
   /* Cut the edges until all are saturated */
   do {

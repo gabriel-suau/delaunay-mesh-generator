@@ -11,6 +11,8 @@ int DMG_loadMesh_medit(DMG_pMesh mesh, char *filename) {
   int i, tmp;
   double dummy;
 
+  posnp = posna = posnt = 0;
+
   if (mesh == NULL) {
     fprintf(stderr, "Error: %s: mesh struct not allocated\n", __func__);
     return DMG_FAILURE;
