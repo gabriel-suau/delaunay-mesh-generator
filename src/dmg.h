@@ -236,7 +236,7 @@ int DMG_removeExterior(DMG_pMesh mesh);
  *
  * Perform mesh optimizations (swaps, collapses, smoothing).
  */
-int DMG_optimizeMesh(DMG_pMesh mesh);
+int DMG_optimize(DMG_pMesh mesh);
 
 
 /**************************************************

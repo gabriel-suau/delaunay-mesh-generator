@@ -176,12 +176,80 @@ int DMG_insertBdryPoints(DMG_pMesh mesh) {
 }
 
 
+int DMG_laplacianSmoothing(DMG_pMesh mesh) {
+  DMG_pPoint ppt, ppt1;
+  DMG_pTria pt, pt1;
+  int ip, it, k, iploc, iploc1, ptcount, tlist[DMG_LIST_SIZE];
+  double c[2];
+
+  /* Set the flag field of each point to 0 */
+  for (ip = 1 ; ip <= mesh->np ; ip++) {
+    ppt = &mesh->point[ip];
+    ppt->flag = 0;
+  }
+
+  /* Visit the vertices using the triangles */
+  for (it = 1 ; it <= mesh->nt; it++) {
+    pt = &mesh->tria[it];
+    if (!DMG_TOK(pt) || pt->ref == 1) continue;
+
+    for (iploc = 0 ; iploc < 3 ; iploc++) {
+      ppt = &mesh->point[pt->v[iploc]];
+
+      // Do not move the already moved vertices
+      // and the boundary vertices
+      if (!DMG_VOK(ppt) || ppt->flag == 1
+          || ppt->tag == DMG_BDYPT) continue;
+
+      ppt->flag = 1;
+      ptcount = DMG_findBall(mesh, it, iploc, tlist);
+
+      /* memcpy(c, ppt->c, 2 * sizeof(double)); */
+      memset(c, 0., 2 * sizeof(double));
+
+      /* For each triangle of the ball,  */
+      for (k = 0 ; k < ptcount ; k++) {
+        pt1 = &mesh->tria[tlist[k] / 3];
+        iploc1 = DMG_tria_vert[tlist[k] % 3 + 1];
+        ppt1 = &mesh->point[pt1->v[iploc1]];
+        c[0] += ppt1->c[0];
+        c[1] += ppt1->c[1];
+      }
+
+      c[0] /= ptcount;
+      c[1] /= ptcount;
+      double w = 0.95;
+      ppt->c[0] = w * c[0] + (1 - w) * ppt->c[0];
+      ppt->c[1] = w * c[1] + (1 - w) * ppt->c[1];
+    }
+  }
+
+  /* Reset the flag field of each point to 0 */
+  for (ip = 1 ; ip <= mesh->np ; ip++) {
+    ppt = &mesh->point[ip];
+    ppt->flag = 0;
+  }
+
+  return DMG_SUCCESS;
+}
+
+
+int DMG_optimize(DMG_pMesh mesh) {
+
+  DMG_computeQual(mesh);
+
+  DMG_laplacianSmoothing(mesh);
+
+  return DMG_SUCCESS;
+}
+
+
 int DMG_refineDelaunay(DMG_pMesh mesh) {
   DMG_pTria pt;
   DMG_pPoint ppta, pptb;
-  DMG_Hedge *htab, *hedge;
+  DMG_Hedge *htab, *tmp, *hedge;
   DMG_Grid *g;
-  int it, jt, j, k, a, b, c, vmin, vmax, key, hsize, n, ptcount, ip, gsize;
+  int it, jt, j, k, a, b, vmin, vmax, key, hsize, n, ptcount, ip, gsize;
   double *ca, *cb, nab[2], cc[2], d, r, alpha, hmin;
 
   htab = (DMG_Hedge*) calloc(3 * (mesh->ntmax + 1), sizeof(DMG_Hedge));
@@ -394,6 +462,8 @@ int DMG_refineDelaunay(DMG_pMesh mesh) {
       assert(htab);
       memset(htab, 0, 3 * (mesh->ntmax + 1) * sizeof(DMG_Hedge)); 
     }
+
+    DMG_optimize(mesh);
 
   } while (ptcount);
 
